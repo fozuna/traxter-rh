@@ -131,8 +131,24 @@ class Installer
             throw new RuntimeException('Preencha todos os campos obrigatórios do instalador.');
         }
 
+        $env = strtolower($env);
+        $env = in_array($env, ['dev', 'development', 'debug'], true) ? 'development' : 'production';
+
         return [
-            'env' => $env === '' ? 'prod' : $env,
+            'app' => [
+                'env' => $env,
+            ],
+            // Identidade do cliente (ajuste após instalar)
+            'cliente' => [
+                'nome' => '',
+                'logo' => '',
+                'site' => '',
+                'cores' => [],
+            ],
+            // Em produção, aponte para uma pasta FORA da pasta pública do site
+            'storage' => [
+                'path' => '',
+            ],
             'security' => [
                 'supervisor_email' => $supervisorEmail,
                 'supervisor_password' => $supervisorPassword,
