@@ -177,4 +177,36 @@
     </div>
   </div>
   <?php endif; ?>
+
+  <!-- LGPD: anonimização a pedido do titular -->
+  <?php $lgpdMsg = [
+      'ok' => ['bg-green-50 border-green-200 text-green-800', 'Candidatura anonimizada. Os dados pessoais e o currículo foram removidos.'],
+      'ja' => ['bg-gray-50 border-gray-200 text-gray-700', 'Esta candidatura já estava anonimizada.'],
+      'confirmacao' => ['bg-amber-50 border-amber-200 text-amber-800', 'Digite ANONIMIZAR no campo de confirmação para prosseguir.'],
+      'erro' => ['bg-red-50 border-red-200 text-red-700', 'Não foi possível anonimizar agora. Tente novamente.'],
+  ][$_GET['lgpd'] ?? ''] ?? null; ?>
+  <div class="mt-8 border-t pt-6">
+    <h3 class="text-lg font-semibold text-ctpblue">Dados pessoais (LGPD)</h3>
+    <?php if ($lgpdMsg): ?>
+      <div class="mt-3 border px-4 py-3 rounded <?= $lgpdMsg[0] ?>" role="status"><?= Security::e($lgpdMsg[1]) ?></div>
+    <?php endif; ?>
+    <?php if (!empty($c['anonimizado_em'])): ?>
+      <p class="mt-2 text-gray-600">Anonimizada em <?= Security::e(date('d/m/Y H:i', strtotime((string)$c['anonimizado_em']))) ?>. Nenhum dado pessoal deste candidato permanece no sistema.</p>
+    <?php elseif (!empty($isAdmin)): ?>
+      <p class="mt-2 text-sm text-gray-600">
+        Use quando o candidato pedir a exclusão dos seus dados. Nome, e-mail, telefone, CPF, experiência, notas e currículo
+        são removidos de forma definitiva; a candidatura continua contando nas estatísticas, sem identificar a pessoa.
+      </p>
+      <form class="mt-3 flex flex-col sm:flex-row gap-3 sm:items-center" method="post"
+            action="<?= $base ?>/admin/candidaturas/<?= (int)$c['id'] ?>/anonimizar"
+            onsubmit="return confirm('Esta ação é definitiva e não pode ser desfeita. Continuar?');">
+        <input type="hidden" name="csrf" value="<?= Security::e($csrf) ?>">
+        <input type="text" name="confirmacao" placeholder="Digite ANONIMIZAR" autocomplete="off"
+               class="border rounded px-3 py-2 w-full sm:w-56" aria-label="Confirmação">
+        <button type="submit" class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">Anonimizar candidato</button>
+      </form>
+    <?php else: ?>
+      <p class="mt-2 text-sm text-gray-600">Pedidos de exclusão de dados devem ser encaminhados a um administrador.</p>
+    <?php endif; ?>
+  </div>
 </div>

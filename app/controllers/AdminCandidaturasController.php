@@ -25,6 +25,7 @@ class AdminCandidaturasController extends Controller
     public function show(string $id): void
     {
         Auth::requireRole(['admin', 'rh', 'viewer']);
+        Retencao::ensureColumn();
         $c = Candidatura::find((int)$id);
         if (!$c) { http_response_code(404); echo 'Candidatura não encontrada'; return; }
         $historico = Candidatura::getHistorico((int)$id);
@@ -37,6 +38,7 @@ class AdminCandidaturasController extends Controller
         }
         $this->view->render('admin/candidaturas/show', [
             'c' => $c, 
+            'isAdmin' => Auth::role() === 'admin',
             'consentimento' => $consentimento,
             'historico' => $historico, 
             'stages' => $stages,
@@ -44,6 +46,27 @@ class AdminCandidaturasController extends Controller
         ], 'layouts/admin');
     }
     
+    /** Anonimiza a candidatura a pedido do titular (LGPD, art. 18). Somente administradores. */
+    public function anonimizar(string $id): void
+    {
+        Auth::requireRole(['admin']);
+        if (!Security::csrfCheck($_POST['csrf'] ?? '')) {
+            http_response_code(400);
+            echo 'Falha na verificação de segurança (CSRF).';
+            return;
+        }
+        if (($_POST['confirmacao'] ?? '') !== 'ANONIMIZAR') {
+            redirect('/admin/candidaturas/' . (int)$id . '?lgpd=confirmacao');
+        }
+        try {
+            $done = Retencao::anonimizar((int)$id, (int)($_SESSION['user_id'] ?? 0) ?: null, 'solicitacao', Security::clientIp());
+        } catch (\Throwable $e) {
+            Logger::exception($e, 'ERROR', ['lgpd' => ['candidatura_id' => (int)$id]]);
+            redirect('/admin/candidaturas/' . (int)$id . '?lgpd=erro');
+        }
+        redirect('/admin/candidaturas/' . (int)$id . '?lgpd=' . ($done ? 'ok' : 'ja'));
+    }
+
     public function download(string $id): void
     {
         Auth::requireRole(['admin', 'rh']);

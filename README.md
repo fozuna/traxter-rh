@@ -77,6 +77,7 @@ Cada cliente tem sua instalação e seu `app/config/config.php`. A identidade vi
 | `php scripts/setup_full.php` | Setup local completo |
 | `php scripts/reset_password_cli.php <email> <nova_senha>` | Redefinir senha (valida a política de senhas) |
 | `php scripts/preflight.php` | Checagem antes de publicar (inclui local dos arquivos privados) |
+| `php scripts/lgpd_retencao.php [--apply]` | Anonimiza candidaturas com prazo de guarda vencido (agendar no cron) |
 | `php scripts/migrate_resumes.php [--apply]` | Migra currículos de instalações antigas para o padrão seguro |
 | `for %f in (tests\php\*.php) do php %f` | Testes PHP (usam o banco configurado) |
 | `npm run build:css` | Recompilar o Tailwind |
@@ -125,6 +126,14 @@ php scripts/migrate_resumes.php --apply    # move, renomeia e atualiza o banco
 - A política usa os dados da seção `cliente` do `config.php`: `nome`, `cnpj`, `email_privacidade` (canal para pedidos dos candidatos) e `retencao_meses`.
 - O texto é um **modelo**: revise com o jurídico antes do uso com candidatos reais. Ao alterar o texto, atualize `Consentimento::VERSAO_POLITICA`.
 - CPF, telefone, nome e experiência dos candidatos são mascarados nos logs.
+
+### Prazo de guarda e exclusão
+
+- **Automático:** `php scripts/lgpd_retencao.php --apply` anonimiza candidaturas sem movimentação há mais de `cliente.retencao_meses` (padrão 12). Candidatos na etapa **Contratado** não são afetados. Sem `--apply`, apenas simula.
+- **Agendamento (Hostinger):** hPanel → *Avançado* → *Cron Jobs* → comando personalizado, uma vez por dia:
+  `/usr/bin/php /home/USUARIO/domains/DOMINIO/public_html/PASTA/scripts/lgpd_retencao.php --apply`
+- **A pedido do candidato:** no detalhe da candidatura, um administrador usa *Anonimizar candidato* (exige digitar ANONIMIZAR). A ação fica registrada na auditoria.
+- Anonimizar remove nome, e-mail, telefone, CPF, experiência, notas, observações do histórico, registro de consentimento e o arquivo do currículo. A candidatura continua nas estatísticas, sem identificar ninguém, e a pessoa pode se candidatar de novo.
 
 ## Regras de segurança do repositório
 

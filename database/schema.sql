@@ -68,6 +68,7 @@ CREATE TABLE IF NOT EXISTS `candidaturas` (
   `indicacao_valor_comissao` decimal(10,2) DEFAULT NULL,
   `indicacao_metodo_pagamento` varchar(50) DEFAULT NULL,
   `indicacao_pagamento_status` varchar(20) NOT NULL DEFAULT 'pendente',
+  `anonimizado_em` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `cpf` (`cpf`),
   KEY `fk_cand_vaga` (`vaga_id`),
