@@ -91,6 +91,14 @@
         <label class="block text-sm font-medium text-ctpblue">Currículo (PDF, até <?= $maxMb ?> MB)</label>
         <input type="file" name="curriculo" accept="application/pdf" required class="mt-1 w-full" />
       </div>
+      <div class="flex items-start gap-2">
+        <input type="checkbox" name="lgpd_aceite" id="lgpd_aceite" value="1" required class="mt-1 h-4 w-4 shrink-0">
+        <label for="lgpd_aceite" class="text-sm text-gray-700">
+          Li e aceito a <a href="<?= $base ?>/privacidade" target="_blank" rel="noopener" class="underline text-ctgreen">Política de Privacidade</a>
+          e autorizo o uso dos meus dados pessoais e do meu currículo por <strong><?= Security::e(Brand::clientName()) ?></strong>
+          para participar deste e de outros processos seletivos.
+        </label>
+      </div>
       <button type="submit" class="bg-ctgreen text-white px-4 py-2 rounded hover:bg-ctdark">Enviar candidatura</button>
     </form>
   </div>

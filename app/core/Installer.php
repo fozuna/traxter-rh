@@ -141,6 +141,9 @@ class Installer
             // Identidade do cliente (ajuste após instalar)
             'cliente' => [
                 'nome' => '',
+                'cnpj' => '',
+                'email_privacidade' => '',
+                'retencao_meses' => 12,
                 'logo' => '',
                 'site' => '',
                 'cores' => [],

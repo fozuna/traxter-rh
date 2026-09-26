@@ -30,6 +30,11 @@ class HomeController extends Controller
         $this->view->render('home/vaga', ['vaga' => $vaga, 'csrf' => $csrf, 'beneficios' => $beneficios]);
     }
 
+    public function privacidade(): void
+    {
+        $this->view->render('home/privacidade', []);
+    }
+
     public function candidatar(string $id): void
     {
         if (!Security::csrfCheck($_POST['csrf'] ?? '')) {
@@ -69,6 +74,11 @@ class HomeController extends Controller
             $this->renderFormError($vaga, 'Você já possui uma candidatura ativa. Aguarde o resultado antes de se candidatar novamente.', 422);
             return;
         }
+        // Consentimento LGPD (obrigatório)
+        if (($_POST['lgpd_aceite'] ?? '') !== '1') {
+            $this->renderFormError($vaga, 'Para se candidatar, é preciso ler e aceitar a Política de Privacidade.', 422);
+            return;
+        }
         // Upload seguro
         try {
             $pdfName = Upload::savePdf($_FILES['curriculo'] ?? [], $nome, $vaga['titulo']);
@@ -76,18 +86,35 @@ class HomeController extends Controller
             $this->renderFormError($vaga, $e->getMessage(), 400);
             return;
         }
-        // Persistência
-        $cid = Candidatura::create([
-            'vaga_id' => (int)$id,
-            'nome' => $nome,
-            'email' => $email,
-            'telefone' => $telefone,
-            'cpf' => $cpf,
-            'cargo_pretendido' => $cargo,
-            'experiencia' => $exp,
-            'pdf_path' => $pdfName,
-            'status' => 'novo',
-        ]);
+        // Persistência: candidatura e consentimento gravados juntos
+        $pdo = Database::conn();
+        try {
+            Consentimento::ensureTable();
+            $pdo->beginTransaction();
+            $cid = Candidatura::create([
+                'vaga_id' => (int)$id,
+                'nome' => $nome,
+                'email' => $email,
+                'telefone' => $telefone,
+                'cpf' => $cpf,
+                'cargo_pretendido' => $cargo,
+                'experiencia' => $exp,
+                'pdf_path' => $pdfName,
+                'status' => 'novo',
+            ]);
+            Consentimento::registrar($cid, Security::clientIp(), (string)($_SERVER['HTTP_USER_AGENT'] ?? ''));
+            if ($pdo->inTransaction()) {
+                $pdo->commit();
+            }
+        } catch (\Throwable $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            @unlink(STORAGE_PATH . DIRECTORY_SEPARATOR . 'resumes' . DIRECTORY_SEPARATOR . $pdfName);
+            Logger::exception($e, 'ERROR', Logger::captureContext(500, ['candidatura' => ['vaga_id' => (int)$id]]));
+            $this->renderFormError($vaga, 'Não foi possível registrar sua candidatura agora. Tente novamente em alguns minutos.', 500);
+            return;
+        }
         // Notificação RH
         $sent = Mailer::notifyHR(
             'Nova candidatura recebida',

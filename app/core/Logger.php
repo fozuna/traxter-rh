@@ -171,7 +171,8 @@ class Logger
 
     private static function redact($value)
     {
-        $sensitive = ['password', 'pass', 'senha', 'token', 'csrf', 'cookie', 'authorization', 'db_pass', 'supervisor_password'];
+        // Credenciais e dados pessoais de candidatos nunca vão para os logs (LGPD)
+        $sensitive = ['password', 'pass', 'senha', 'token', 'csrf', 'cookie', 'authorization', 'db_pass', 'supervisor_password', 'cpf', 'telefone', 'nome', 'experiencia'];
         if (is_array($value)) {
             $out = [];
             foreach ($value as $k => $v) {

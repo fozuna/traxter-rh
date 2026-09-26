@@ -119,6 +119,13 @@ php scripts/migrate_resumes.php            # simulação: mostra o que será fei
 php scripts/migrate_resumes.php --apply    # move, renomeia e atualiza o banco
 ```
 
+## LGPD no portal de vagas
+
+- O formulário de candidatura exige o aceite da **Política de Privacidade** (`/privacidade`). O aceite é gravado na tabela `lgpd_consentimentos` com data, IP, navegador e versão da política, e aparece no detalhe da candidatura no painel.
+- A política usa os dados da seção `cliente` do `config.php`: `nome`, `cnpj`, `email_privacidade` (canal para pedidos dos candidatos) e `retencao_meses`.
+- O texto é um **modelo**: revise com o jurídico antes do uso com candidatos reais. Ao alterar o texto, atualize `Consentimento::VERSAO_POLITICA`.
+- CPF, telefone, nome e experiência dos candidatos são mascarados nos logs.
+
 ## Regras de segurança do repositório
 
 - **Nunca** versionar `app/config/config.php`, dumps de banco ou arquivos de `storage/` e `uploads/`.

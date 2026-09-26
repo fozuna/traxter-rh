@@ -20,6 +20,14 @@
           <?php if (!empty($c['cpf'])): ?>
             <p class="text-gray-600"><strong>CPF:</strong> <?= substr($c['cpf'], 0, 3) . '.' . substr($c['cpf'], 3, 3) . '.' . substr($c['cpf'], 6, 3) . '-' . substr($c['cpf'], 9, 2) ?></p>
           <?php endif; ?>
+          <p class="text-gray-600"><strong>Consentimento LGPD:</strong>
+            <?php if (!empty($consentimento)): ?>
+              aceito em <?= Security::e(date('d/m/Y H:i', strtotime((string)$consentimento['aceito_em']))) ?>
+              (política <?= Security::e((string)$consentimento['versao_politica']) ?>)
+            <?php else: ?>
+              <span class="text-amber-700">não registrado (candidatura anterior ao aceite obrigatório)</span>
+            <?php endif; ?>
+          </p>
           <p class="mt-2"><strong>Cargo pretendido:</strong> <?= Security::e($c['cargo_pretendido'] ?? $c['vaga_titulo'] ?? '') ?></p>
           <p class="mt-2"><strong>E-mail:</strong> <?= Security::e($c['email']) ?></p>
           <p class="mt-2"><strong>Telefone:</strong> <?= Security::e(Phone::format($c['telefone'] ?? '')) ?></p>

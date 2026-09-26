@@ -33,6 +33,29 @@ class Brand
         return preg_match('#^https?://#i', $site) ? $site : '';
     }
 
+    /** CNPJ do cliente (controlador dos dados), se informado. */
+    public static function clientCnpj(): string
+    {
+        return trim((string)(self::client()['cnpj'] ?? ''));
+    }
+
+    /** E-mail para pedidos de titulares de dados (LGPD). Padrão: e-mail do RH. */
+    public static function privacyEmail(): string
+    {
+        $email = trim((string)(self::client()['email_privacidade'] ?? ''));
+        if ($email === '') {
+            $email = trim((string)(Config::get()['mail']['to_hr'] ?? ''));
+        }
+        return filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : '';
+    }
+
+    /** Meses de guarda dos dados após o fim do processo seletivo (padrão 12). */
+    public static function retentionMonths(): int
+    {
+        $m = (int)(self::client()['retencao_meses'] ?? 12);
+        return $m > 0 ? min($m, 60) : 12;
+    }
+
     /** Há logo próprio do cliente configurado e presente em disco? */
     public static function hasClientLogo(): bool
     {

@@ -30,8 +30,14 @@ class AdminCandidaturasController extends Controller
         $historico = Candidatura::getHistorico((int)$id);
         $stages = PipelineStage::all();
         $csrf = Security::csrfToken();
+        try {
+            $consentimento = Consentimento::daCandidatura((int)$id);
+        } catch (\Throwable $e) {
+            $consentimento = null;
+        }
         $this->view->render('admin/candidaturas/show', [
             'c' => $c, 
+            'consentimento' => $consentimento,
             'historico' => $historico, 
             'stages' => $stages,
             'csrf' => $csrf

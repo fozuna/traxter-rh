@@ -117,6 +117,7 @@
   <footer class="fixed bottom-0 left-0 right-0 border-t bg-white">
     <div class="max-w-6xl mx-auto px-4 py-6 text-gray-500 text-sm text-center">
       © <?= date('Y') ?> <?= Security::e(Brand::clientName()) ?>. Todos os direitos reservados.
+      <a href="<?= $base ?>/privacidade" class="underline hover:text-ctgreen">Política de Privacidade</a>
       <span class="block sm:inline text-xs text-gray-400">Plataforma <?= Security::e(Brand::productName()) ?> v<?= Security::e(Config::app()['version'] ?? '') ?></span>
     </div>
   </footer>

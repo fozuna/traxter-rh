@@ -11,6 +11,9 @@ return [
     // Identidade da empresa cliente desta instalação
     'cliente' => [
         'nome' => 'Empresa Exemplo',          // aparece no portal de vagas, títulos e exportações
+        'cnpj' => '',                         // exibido na Política de Privacidade (controlador dos dados)
+        'email_privacidade' => '',            // canal para pedidos LGPD dos candidatos (vazio = e-mail do RH)
+        'retencao_meses' => 12,               // meses de guarda dos dados após o fim do processo seletivo
         'logo' => '',                         // ex.: 'uploads/marca/logo.png' (PNG ou WEBP claro, para fundo escuro). Vazio = logo TRAXTER
         'site' => '',                         // ex.: 'https://www.empresa.com.br'
         'cores' => [                          // formato #rrggbb

@@ -21,6 +21,9 @@ class Config
             ],
             'cliente' => [
                 'nome' => '',
+                'cnpj' => '',
+                'email_privacidade' => '',
+                'retencao_meses' => 12,
                 'logo' => '',
                 'site' => '',
                 'cores' => []

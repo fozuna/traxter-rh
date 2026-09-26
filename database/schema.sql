@@ -182,3 +182,16 @@ INSERT IGNORE INTO pipeline_stages (id, nome, ordem, cor) VALUES
   (4, 'Proposta', 4, '#1d2d44'),
   (5, 'Contratado', 5, '#1d2d44'),
   (6, 'Rejeitado', 6, '#ef4444');
+
+-- Registro de consentimento LGPD dos candidatos
+CREATE TABLE IF NOT EXISTS `lgpd_consentimentos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `candidatura_id` int(11) NOT NULL,
+  `versao_politica` varchar(20) NOT NULL,
+  `ip` varchar(45) DEFAULT NULL,
+  `user_agent` varchar(255) DEFAULT NULL,
+  `aceito_em` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_consent_candidatura` (`candidatura_id`),
+  CONSTRAINT `fk_consent_candidatura` FOREIGN KEY (`candidatura_id`) REFERENCES `candidaturas` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

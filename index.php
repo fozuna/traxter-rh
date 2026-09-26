@@ -26,6 +26,7 @@ try {
 
     $router->get('/vagas', [HomeController::class, 'index']);
     $router->get('/vaga/{id}', [HomeController::class, 'vaga']);
+    $router->get('/privacidade', [HomeController::class, 'privacidade']);
     $router->post('/candidatar/{id}', [HomeController::class, 'candidatar']);
 
     $router->post('/api/check-cpf', [ApiController::class, 'checkCpf']);
