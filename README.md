@@ -135,3 +135,15 @@ Exemplo: `rh.traxter.com.br`.
 Se o cPanel tiver *Terminal*, `php scripts/preflight.php` confere tudo de uma vez.
 
 Deploy automatizado: `.cpanel.yml.example` (copie para `.cpanel.yml` e ajuste `DEPLOYPATH`).
+
+## Publicar pela Hostinger (Git do hPanel)
+
+1. hPanel → *Sites* → *Domínios / Subdomínios*: crie `rh.traxter.com.br`. A pasta do subdomínio precisa estar **vazia** (apague o `default.php`/`index.html` que a Hostinger cria).
+2. hPanel → *Avançado* → *Git*:
+   - Repositório privado: clique em **Gerar chave SSH**, copie e adicione no GitHub em *traxter-rh → Settings → Deploy keys* (somente leitura).
+   - Repositório: `git@github.com:fozuna/traxter-rh.git` · Branch: `main` · Diretório: a pasta do subdomínio.
+3. Crie o banco em *Bancos de Dados MySQL* e siga os passos 6 a 9 da seção cPanel (pasta privada, `install.php`, ajustes do `config.php`, conferência dos 403).
+4. **Antes de usar com clientes, teste o redeploy:** faça um commit simples, clique em *Redeploy* e confirme que `app/config/config.php` continua lá. Guarde sempre uma cópia do `config.php` fora da pasta do site.
+5. Deploy automático (webhook) é opcional: bom para a demonstração; para clientes, prefira redeploy manual, para controlar quando cada um recebe atualização.
+
+A Hostinger usa LiteSpeed, que respeita as regras do `.htaccess` (inclusive o bloqueio da pasta `.git`).

@@ -262,6 +262,12 @@ class Installer
 
     private static function trySelfDelete(callable $log): bool
     {
+        // Em deploy via Git (Hostinger, cPanel Git), apagar arquivos versionados gera conflito
+        // no próximo "git pull". O instalador já fica bloqueado pelo config.php/lock.
+        if (is_dir(self::basePath() . '/.git')) {
+            $log('Deploy via Git detectado: install.php mantido (bloqueado automaticamente).');
+            return false;
+        }
         $deletedAny = false;
         foreach ([self::basePath() . '/install.php', self::basePath() . '/public/install.php'] as $file) {
             if (!is_file($file)) {
