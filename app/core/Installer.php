@@ -234,6 +234,7 @@ class Installer
                     PDO::ATTR_EMULATE_PREPARES => false,
                 ]
             );
+            $pdo->exec("SET time_zone = '" . date('P') . "'");
             return $pdo;
         } catch (Throwable $e) {
             throw new RuntimeException('Falha na conexão com banco de dados: ' . $e->getMessage());

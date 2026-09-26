@@ -17,7 +17,8 @@ class Config
                 'release_date' => '',
                 'base_url' => '',
                 'public_jobs_url' => '',
-                'env' => 'auto'
+                'env' => 'auto',
+                'timezone' => 'America/Campo_Grande'
             ],
             'cliente' => [
                 'nome' => '',
@@ -117,6 +118,7 @@ class Config
             'base_url' => (string)($cfg['app']['base_url'] ?? ''),
             'public_jobs_url' => (string)($cfg['app']['public_jobs_url'] ?? ''),
             'env' => (string)($cfg['app']['env'] ?? 'development'),
+            'timezone' => (string)($cfg['app']['timezone'] ?? 'America/Campo_Grande'),
             'security' => $cfg['security'],
             'mail' => $cfg['mail'],
             'logging' => $cfg['logging'],

@@ -16,6 +16,8 @@ class Database
             
             try {
                 self::$pdo = new \PDO($config['dsn'], $config['user'], $config['pass'], $config['options']);
+                // Offset numérico (ex.: -04:00) funciona mesmo sem as tabelas de fuso do MySQL instaladas
+                self::$pdo->exec("SET time_zone = '" . date('P') . "'");
             } catch (\PDOException $e) {
                 // Em desenvolvimento, log o erro mas não pare a aplicação
                 if (Config::app()['env'] === 'dev') {

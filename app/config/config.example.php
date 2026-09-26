@@ -6,7 +6,8 @@ return [
         'release_date' => '',
         'base_url' => '',
         'public_jobs_url' => '',
-        'env' => 'auto'
+        'env' => 'auto',
+        'timezone' => 'America/Campo_Grande'   // fuso da empresa (ex.: America/Sao_Paulo, America/Cuiaba)
     ],
     // Identidade da empresa cliente desta instalação
     'cliente' => [

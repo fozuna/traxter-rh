@@ -16,6 +16,10 @@ if (!defined('STORAGE_PATH')) {
     define('STORAGE_PATH', $customStorage !== '' ? rtrim($customStorage, '/\\') : BASE_PATH . DIRECTORY_SEPARATOR . 'storage');
     unset($customStorage);
 }
+// Fuso horário da empresa (padrão: Mato Grosso do Sul). Vale para PHP e, via Database, para o MySQL.
+$tz = (string)(Config::get()['app']['timezone'] ?? 'America/Campo_Grande');
+date_default_timezone_set(in_array($tz, timezone_identifiers_list(), true) ? $tz : 'America/Campo_Grande');
+unset($tz);
 require_once __DIR__ . '/Brand.php';
 require_once __DIR__ . '/Logger.php';
 require_once __DIR__ . '/Database.php';
