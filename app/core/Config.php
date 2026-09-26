@@ -40,12 +40,22 @@ class Config
             ],
             'security' => [
                 'csrf_key' => 'csrf_token',
-                'session_name' => 'TRXRHSESSID'
+                'session_name' => 'TRXRHSESSID',
+                'supervisor_email' => '',
+                'supervisor_password' => '',
+                'allowed_upload_mime' => ['application/pdf'],
+                'max_upload_bytes' => 5 * 1024 * 1024,
+                'allowed_image_mime' => ['image/png', 'image/jpeg', 'image/webp'],
+                'max_image_bytes' => 2 * 1024 * 1024
             ],
             'mail' => [
                 'enabled' => false,
                 'from' => '',
-                'to_hr' => ''
+                'to_hr' => '',
+                'subject_new_application' => 'Nova candidatura recebida',
+                'subject_password_recovery' => 'Recuperação de senha',
+                'subject_password_changed' => 'Senha redefinida',
+                'subject_supervisor_created' => 'Usuário Supervisor criado'
             ],
             'logging' => [
                 'level' => 'INFO',

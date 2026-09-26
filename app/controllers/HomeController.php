@@ -51,34 +51,29 @@ class HomeController extends Controller
         $cargo = Security::sanitizeString($_POST['cargo_pretendido'] ?? '');
         $exp = Security::sanitizeString($_POST['experiencia'] ?? '');
         if (!$nome || !$email || !$telefoneRaw || !$cpf || !$cargo || !$exp) {
-            http_response_code(422);
-            echo 'Campos obrigatórios não preenchidos.';
+            $this->renderFormError($vaga, 'Campos obrigatórios não preenchidos.', 422);
             return;
         }
 
         $telefone = Phone::normalize($telefoneRaw);
         if ($telefone === null) {
-            http_response_code(422);
-            echo 'Telefone inválido. Informe 11 dígitos (DDD + número).';
+            $this->renderFormError($vaga, 'Telefone inválido. Informe 11 dígitos (DDD + número).', 422);
             return;
         }
         // Validação do CPF
         if (!Security::isValidCpf($cpf)) {
-            http_response_code(422);
-            echo 'CPF inválido (formato ou dígitos verificadores).';
+            $this->renderFormError($vaga, 'CPF inválido (formato ou dígitos verificadores).', 422);
             return;
         }
         if (Candidatura::cpfExists($cpf)) {
-            http_response_code(422);
-            echo 'Você já possui uma candidatura ativa. Aguarde o resultado antes de se candidatar novamente.';
+            $this->renderFormError($vaga, 'Você já possui uma candidatura ativa. Aguarde o resultado antes de se candidatar novamente.', 422);
             return;
         }
         // Upload seguro
         try {
             $pdfName = Upload::savePdf($_FILES['curriculo'] ?? [], $nome, $vaga['titulo']);
         } catch (\Throwable $e) {
-            http_response_code(400);
-            echo Security::e($e->getMessage());
+            $this->renderFormError($vaga, $e->getMessage(), 400);
             return;
         }
         // Persistência
@@ -102,6 +97,28 @@ class HomeController extends Controller
             'vaga' => $vaga,
             'cid' => $cid,
             'emailSent' => $sent,
+        ]);
+    }
+
+    /** Reexibe o formulário da vaga com a mensagem de erro e os dados já digitados (exceto o arquivo). */
+    private function renderFormError(array $vaga, string $message, int $status): void
+    {
+        http_response_code($status);
+        try {
+            $beneficios = Beneficio::allActive();
+        } catch (\Throwable $e) {
+            $beneficios = [];
+        }
+        $old = [];
+        foreach (['nome', 'email', 'telefone', 'cpf', 'experiencia'] as $field) {
+            $old[$field] = (string)($_POST[$field] ?? '');
+        }
+        $this->view->render('home/vaga', [
+            'vaga' => $vaga,
+            'csrf' => Security::csrfToken(),
+            'beneficios' => $beneficios,
+            'erro' => $message,
+            'old' => $old,
         ]);
     }
 }

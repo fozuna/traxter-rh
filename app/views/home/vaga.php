@@ -44,20 +44,26 @@
 
   <div class="mt-6">
     <h3 class="font-medium text-ctpblue">Formulário de Candidatura</h3>
+    <?php $old = $old ?? []; $maxMb = (int)round(((int)(Config::app()['security']['max_upload_bytes'] ?? 5242880)) / 1048576); ?>
+    <?php if (!empty($erro)): ?>
+      <div id="form-erro" class="mt-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded" role="alert">
+        <?= Security::e($erro) ?>
+      </div>
+    <?php endif; ?>
     <form class="mt-3 space-y-4" action="<?= $base ?>/candidatar/<?= (int)$vaga['id'] ?>" method="post" enctype="multipart/form-data">
       <input type="hidden" name="csrf" value="<?= Security::e($csrf) ?>">
       <div>
         <label class="block text-sm font-medium text-ctpblue">Nome</label>
-        <input type="text" name="nome" required class="mt-1 w-full border rounded px-3 py-2 shadow-sm focus:border-ctgreen focus:ring-1 focus:ring-ctgreen" />
+        <input type="text" name="nome" value="<?= Security::e($old['nome'] ?? '') ?>" required class="mt-1 w-full border rounded px-3 py-2 shadow-sm focus:border-ctgreen focus:ring-1 focus:ring-ctgreen" />
       </div>
       <div class="grid md:grid-cols-2 gap-3">
         <div>
           <label class="block text-sm font-medium text-ctpblue">E-mail</label>
-          <input type="email" name="email" required class="mt-1 w-full border rounded px-3 py-2 shadow-sm focus:border-ctgreen focus:ring-1 focus:ring-ctgreen" />
+          <input type="email" name="email" value="<?= Security::e($old['email'] ?? '') ?>" required class="mt-1 w-full border rounded px-3 py-2 shadow-sm focus:border-ctgreen focus:ring-1 focus:ring-ctgreen" />
         </div>
         <div>
           <label class="block text-sm font-medium text-ctpblue">Telefone</label>
-          <input type="tel" name="telefone" required data-phone-input="1" maxlength="15" placeholder="(00) 00000-0000" class="mt-1 w-full border rounded px-3 py-2 shadow-sm focus:border-ctgreen focus:ring-1 focus:ring-ctgreen" />
+          <input type="tel" name="telefone" value="<?= Security::e($old['telefone'] ?? '') ?>" required data-phone-input="1" maxlength="15" placeholder="(00) 00000-0000" class="mt-1 w-full border rounded px-3 py-2 shadow-sm focus:border-ctgreen focus:ring-1 focus:ring-ctgreen" />
           <div data-phone-error="invalid" class="text-red-600 text-sm mt-1 hidden">Telefone inválido. Informe 11 dígitos (DDD + número).</div>
         </div>
       </div>
@@ -66,7 +72,7 @@
           CPF 
           <span class="ml-1 text-gray-400 cursor-help" title="Precisamos do seu CPF para evitar candidaturas duplicadas e garantir a integridade do processo seletivo">ℹ️</span>
         </label>
-        <input type="text" name="cpf" id="cpf" maxlength="14" required data-cpf-input="1"
+        <input type="text" name="cpf" id="cpf" maxlength="14" value="<?= Security::e($old['cpf'] ?? '') ?>" required data-cpf-input="1"
                class="mt-1 w-full border rounded px-3 py-2 shadow-sm focus:border-ctgreen focus:ring-1 focus:ring-ctgreen" 
                placeholder="000.000.000-00" />
         <div id="cpf-error" data-cpf-error="exists" class="text-red-600 text-sm mt-1 hidden">Você já possui uma candidatura ativa. Aguarde o resultado antes de se candidatar novamente.</div>
@@ -79,10 +85,10 @@
       </div>
       <div>
         <label class="block text-sm font-medium text-ctpblue">Experiência</label>
-        <textarea name="experiencia" rows="4" class="mt-1 w-full border rounded px-3 py-2 shadow-sm focus:border-ctgreen focus:ring-1 focus:ring-ctgreen" required></textarea>
+        <textarea name="experiencia" rows="4" class="mt-1 w-full border rounded px-3 py-2 shadow-sm focus:border-ctgreen focus:ring-1 focus:ring-ctgreen" required><?= Security::e($old['experiencia'] ?? '') ?></textarea>
       </div>
       <div>
-        <label class="block text-sm font-medium text-ctpblue">Currículo (PDF)</label>
+        <label class="block text-sm font-medium text-ctpblue">Currículo (PDF, até <?= $maxMb ?> MB)</label>
         <input type="file" name="curriculo" accept="application/pdf" required class="mt-1 w-full" />
       </div>
       <button type="submit" class="bg-ctgreen text-white px-4 py-2 rounded hover:bg-ctdark">Enviar candidatura</button>
