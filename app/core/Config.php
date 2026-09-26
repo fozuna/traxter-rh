@@ -72,7 +72,7 @@ class Config
             ]
         ];
         if (is_file($baseConfigPath)) {
-            $base = require $baseConfigPath;
+            $base = self::load($baseConfigPath);
             if (is_array($base)) {
                 $config = array_replace_recursive($config, $base);
             }
@@ -80,7 +80,7 @@ class Config
 
         $localPath = __DIR__ . '/../config/local.php';
         if (is_file($localPath)) {
-            $local = require $localPath;
+            $local = self::load($localPath);
             if (is_array($local)) {
                 $config = array_replace_recursive($config, $local);
             }
@@ -104,6 +104,31 @@ class Config
 
         self::$cache = $config;
         return self::$cache;
+    }
+
+    /**
+     * Carrega um arquivo de configuração. Erro de digitação no config.php mostra uma
+     * mensagem clara (arquivo e linha) em vez de uma página 500 em branco.
+     */
+    private static function load(string $path)
+    {
+        try {
+            return require $path;
+        } catch (\ParseError $e) {
+            error_log('Config inválido: ' . $path . ' linha ' . $e->getLine() . ': ' . $e->getMessage());
+            if (PHP_SAPI === 'cli') {
+                fwrite(STDERR, 'Erro de sintaxe em ' . basename(dirname($path)) . '/' . basename($path) . ', linha ' . $e->getLine() . ': ' . $e->getMessage() . PHP_EOL);
+                exit(1);
+            }
+            http_response_code(500);
+            header('Content-Type: text/html; charset=utf-8');
+            echo '<!doctype html><meta charset="utf-8"><title>Configuração inválida</title>'
+                . '<div style="font-family:system-ui,sans-serif;max-width:640px;margin:10vh auto;padding:24px;border:1px solid #fecaca;background:#fef2f2;border-radius:12px;color:#7f1d1d">'
+                . '<h1 style="font-size:20px;margin:0 0 8px">Erro no arquivo de configuração</h1>'
+                . '<p style="margin:0">Há um erro de digitação em <code>app/config/' . htmlspecialchars(basename($path)) . '</code>, perto da <strong>linha ' . (int)$e->getLine() . '</strong>.</p>'
+                . '<p style="margin:8px 0 0;font-size:14px">Confira vírgulas, parênteses e aspas nessa linha e na anterior.</p></div>';
+            exit;
+        }
     }
 
     /** Descarta o cache (usado pelo instalador logo após gravar o config.php). */
