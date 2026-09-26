@@ -27,6 +27,7 @@ storage/install.done
 # Uploads de clientes
 uploads/*
 !uploads/logos/
+!uploads/.htaccess
 uploads/logos/*
 !uploads/logos/.gitkeep
 # Dumps de banco com dados reais

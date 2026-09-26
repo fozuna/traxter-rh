@@ -119,7 +119,7 @@ class Brand
     private static function clientLogoPath(): ?string
     {
         $path = ltrim(str_replace('\\', '/', trim((string)(self::client()['logo'] ?? ''))), '/');
-        if ($path === '' || str_contains($path, '..') || !preg_match('/\.(png|jpe?g|webp|svg)$/i', $path)) {
+        if ($path === '' || str_contains($path, '..') || !preg_match('/\.(png|jpe?g|webp)$/i', $path)) {
             return null;
         }
         return is_file(BASE_PATH . '/' . $path) ? $path : null;

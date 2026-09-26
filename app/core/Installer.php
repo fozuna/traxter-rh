@@ -1,9 +1,24 @@
 <?php
 class Installer
 {
+    /**
+     * Instalado = existe o lock OU já há um config.php com banco configurado
+     * (ex.: instalação feita pelo scripts/setup_full.php). Isso impede que o
+     * instalador web seja reaberto e sobrescreva a configuração.
+     */
     public static function isInstalled(): bool
     {
-        return is_file(self::installLockPath());
+        if (is_file(self::installLockPath())) {
+            return true;
+        }
+        $configPath = self::configPath();
+        if (is_file($configPath)) {
+            $cfg = @include $configPath;
+            if (is_array($cfg) && trim((string)($cfg['database']['dsn'] ?? '')) !== '') {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static function requirements(): array
@@ -282,7 +297,7 @@ class Installer
 
     private static function storagePath(): string
     {
-        return self::basePath() . '/storage';
+        return defined('STORAGE_PATH') ? \STORAGE_PATH : self::basePath() . '/storage';
     }
 
     private static function localConfigPath(): string

@@ -25,25 +25,19 @@ class Upload
             throw new \RuntimeException('Extensão inválida. Envie apenas PDF.');
         }
         
-        // Criar nome descritivo se fornecidos nome e vaga
-        if (!empty($candidateName) && !empty($jobTitle)) {
-            // Limpar caracteres especiais para nome de arquivo
-            $cleanName = preg_replace('/[^a-zA-Z0-9\s]/', '', $candidateName);
-            $cleanJob = preg_replace('/[^a-zA-Z0-9\s]/', '', $jobTitle);
-            $cleanName = preg_replace('/\s+/', '_', trim($cleanName));
-            $cleanJob = preg_replace('/\s+/', '_', trim($cleanJob));
-            
-            $name = $cleanName . '_' . $cleanJob . '_' . date('Y-m-d_H-i-s') . '.pdf';
-        } else {
-            // Nome criptografado como fallback
-            $name = bin2hex(random_bytes(16)) . '.pdf';
-        }
-        
+        // Nome aleatório: não expõe dados do candidato e não pode ser adivinhado.
+        // O nome amigável (Candidato_Vaga.pdf) é gerado apenas no download autenticado.
+        $name = bin2hex(random_bytes(20)) . '.pdf';
+
         $destDir = STORAGE_PATH . DIRECTORY_SEPARATOR . 'resumes';
         $destPath = $destDir . DIRECTORY_SEPARATOR . $name;
+        if (!is_dir($destDir)) {
+            @mkdir($destDir, 0770, true);
+        }
         if (!move_uploaded_file($file['tmp_name'], $destPath)) {
             throw new \RuntimeException('Não foi possível salvar o arquivo.');
         }
+        @chmod($destPath, 0640);
         return $name; // armazenamos apenas o nome para posterior recuperação
     }
 

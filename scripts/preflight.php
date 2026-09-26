@@ -22,6 +22,20 @@ if (count($req['failed_requirements']) === 0) {
 }
 
 $app = Config::app();
+
+// Currículos e logs devem ficar fora da pasta pública em produção
+$storageReal = realpath(STORAGE_PATH) ?: STORAGE_PATH;
+$baseReal = realpath(BASE_PATH) ?: BASE_PATH;
+$storageInsideWeb = str_starts_with($storageReal . DIRECTORY_SEPARATOR, $baseReal . DIRECTORY_SEPARATOR);
+$isProd = ($app['env'] ?? 'production') === 'production';
+$add(
+    'Arquivos privados fora da pasta pública',
+    !$storageInsideWeb || !$isProd,
+    $storageInsideWeb
+        ? ($isProd ? 'Configure storage.path para uma pasta fora do site: ' . $storageReal : 'Aceitável em desenvolvimento.')
+        : $storageReal
+);
+$add('Pasta de currículos gravável', is_dir(STORAGE_PATH . '/resumes') && is_writable(STORAGE_PATH . '/resumes'));
 $db = $app['database'] ?? [];
 $dsn = (string)($db['dsn'] ?? '');
 $user = (string)($db['user'] ?? '');

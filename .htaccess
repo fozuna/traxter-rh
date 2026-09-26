@@ -1,4 +1,30 @@
-RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^ index.php [QSA,L]
+# TRAXTER RH - regras de acesso (Apache / Laragon / cPanel)
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # 1. Pastas internas nunca são servidas pela web (código, banco, scripts, arquivos privados)
+  RewriteRule ^(app|database|scripts|storage|tests|node_modules|vendor)(/|$) - [F,L]
+
+  # 2. Arquivos e pastas ocultos (.git, .env, .cpanel.yml...), exceto .well-known
+  RewriteRule (^|/)\.(?!well-known/) - [F,L]
+
+  # 3. Extensões sensíveis e arquivos de configuração de ferramentas
+  RewriteRule \.(sql|log|md|txt|lock|json|ya?ml|ps1|sh|bat|cmd|bak|ini|env|dist|example)$ - [F,L,NC]
+  RewriteRule (^|/)[^/]+\.config\.js$ - [F,L]
+
+  # 4. Servidor de desenvolvimento do PHP não deve ser acessível
+  RewriteRule ^router\.php$ - [F,L]
+
+  # 5. Front controller
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ index.php [QSA,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

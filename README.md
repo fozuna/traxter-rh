@@ -58,7 +58,7 @@ Cada cliente tem sua instalação e seu `app/config/config.php`. A identidade vi
 ],
 ```
 
-- Coloque o arquivo do logo em `uploads/marca/` (PNG, SVG ou WEBP). Essa pasta não vai para o Git.
+- Coloque o arquivo do logo em `uploads/marca/` (PNG, JPG ou WEBP; SVG não é aceito por segurança). Essa pasta não vai para o Git.
 - Sem logo configurado, o sistema usa o logo TRAXTER. Cores inválidas voltam ao padrão.
 - O contato de suporte exibido no manual fica na seção `suporte`.
 - Não é preciso recompilar o CSS: as cores são aplicadas por variáveis CSS em tempo de execução.
@@ -69,7 +69,8 @@ Cada cliente tem sua instalação e seu `app/config/config.php`. A identidade vi
 |---|---|
 | `php scripts/setup_full.php` | Setup local completo |
 | `php scripts/reset_password_cli.php <email> <nova_senha>` | Redefinir senha (valida a política de senhas) |
-| `php scripts/preflight.php` | Checagem antes de publicar |
+| `php scripts/preflight.php` | Checagem antes de publicar (inclui local dos arquivos privados) |
+| `php scripts/migrate_resumes.php [--apply]` | Migra currículos de instalações antigas para o padrão seguro |
 | `for %f in (tests\php\*.php) do php %f` | Testes PHP (usam o banco configurado) |
 | `npm run build:css` | Recompilar o Tailwind |
 
@@ -88,6 +89,27 @@ database/
 scripts/        Setup, deploy e utilitários de linha de comando
 storage/        Currículos, logs, sessões (fora do Git)
 tests/          Testes PHP e Playwright
+```
+
+## Currículos e arquivos privados
+
+- Currículos são salvos com **nome aleatório** (sem dados do candidato) e só são entregues pelo download autenticado do painel, que gera o nome amigável `Candidato_Vaga.pdf`.
+- A pasta de arquivos privados (currículos, logs, sessões) é definida em `storage.path` no `config.php`:
+  - **Laragon / desenvolvimento:** deixe vazio (usa `storage/` do projeto).
+  - **Produção:** use uma pasta **fora** da pasta pública do site, por exemplo `/home/USUARIO/traxter-rh-storage`. O `php scripts/preflight.php` avisa se isso não estiver configurado.
+- O `.htaccess` da raiz bloqueia o acesso web a `app/`, `storage/`, `database/`, `scripts/`, `tests/`, arquivos ocultos e extensões sensíveis. Isso vale para Apache (padrão do Laragon e do cPanel). **Se usar Nginx, essas regras não se aplicam**: nesse caso o `storage.path` fora da pasta pública é obrigatório.
+- A pasta `uploads/` (logos) não executa scripts nem aceita SVG.
+- O instalador web (`install.php`) fica bloqueado assim que existe um `config.php` com banco configurado.
+
+### Atualizando uma instalação antiga
+
+Instalações anteriores salvavam currículos com o nome do candidato dentro de `storage/resumes`. Para migrar:
+
+```bash
+# 1. backup do banco e da pasta storage/resumes
+# 2. configure storage.path no config.php (produção)
+php scripts/migrate_resumes.php            # simulação: mostra o que será feito
+php scripts/migrate_resumes.php --apply    # move, renomeia e atualiza o banco
 ```
 
 ## Regras de segurança do repositório

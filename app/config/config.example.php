@@ -11,13 +11,19 @@ return [
     // Identidade da empresa cliente desta instalação
     'cliente' => [
         'nome' => 'Empresa Exemplo',          // aparece no portal de vagas, títulos e exportações
-        'logo' => '',                         // ex.: 'uploads/marca/logo.png' (PNG/SVG claro, para fundo escuro). Vazio = logo TRAXTER
+        'logo' => '',                         // ex.: 'uploads/marca/logo.png' (PNG ou WEBP claro, para fundo escuro). Vazio = logo TRAXTER
         'site' => '',                         // ex.: 'https://www.empresa.com.br'
         'cores' => [                          // formato #rrggbb
             'escuro' => '#0d1321',            // cabeçalho, menu lateral, títulos
             'medio'  => '#1d2d44',            // botões e destaques
             'claro'  => '#3e5c76'             // detalhes, bordas, foco
         ]
+    ],
+    // Arquivos privados (currículos, logs, sessões).
+    // Vazio = pasta storage/ do projeto (ok no Laragon).
+    // Em produção use uma pasta FORA da pública, ex.: '/home/USUARIO/traxter-rh-storage'
+    'storage' => [
+        'path' => ''
     ],
     // Suporte exibido no manual do sistema
     'suporte' => [

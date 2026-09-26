@@ -25,6 +25,9 @@ class Config
                 'site' => '',
                 'cores' => []
             ],
+            'storage' => [
+                'path' => ''
+            ],
             'suporte' => [
                 'nome' => 'TRAXTER Sistemas e Automações',
                 'site' => 'https://traxter.com.br/',

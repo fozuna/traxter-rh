@@ -1,0 +1,10 @@
+# Uploads públicos (logos): nunca executar scripts nem listar arquivos
+Options -Indexes -ExecCGI
+<FilesMatch "\.(php\d?|phtml|phar|pl|py|cgi|sh|html?|svgz?|js)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+</FilesMatch>
+<IfModule mod_php.c>
+  php_flag engine off
+</IfModule>

@@ -8,11 +8,14 @@ if (!defined('APP_PATH')) {
 if (!defined('PUBLIC_PATH')) {
     define('PUBLIC_PATH', BASE_PATH);
 }
-if (!defined('STORAGE_PATH')) {
-    define('STORAGE_PATH', BASE_PATH . DIRECTORY_SEPARATOR . 'storage');
-}
 
 require_once __DIR__ . '/Config.php';
+if (!defined('STORAGE_PATH')) {
+    // Em produção, aponte 'storage.path' para uma pasta FORA da pasta pública do site
+    $customStorage = trim((string)(Config::get()['storage']['path'] ?? ''));
+    define('STORAGE_PATH', $customStorage !== '' ? rtrim($customStorage, '/\\') : BASE_PATH . DIRECTORY_SEPARATOR . 'storage');
+    unset($customStorage);
+}
 require_once __DIR__ . '/Brand.php';
 require_once __DIR__ . '/Logger.php';
 require_once __DIR__ . '/Database.php';
