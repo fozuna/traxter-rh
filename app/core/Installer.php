@@ -58,12 +58,20 @@ class Installer
         }
 
         $config = self::buildConfig($input);
+
+        // Validações ANTES de gravar qualquer arquivo: se algo estiver errado,
+        // nada é criado e o instalador continua disponível para nova tentativa.
+        self::validateAdminInput($input);
+        $pdo = self::connect($config['database'], $log);
+
         $configMode = strtolower(trim((string)($input['config_mode'] ?? 'config')));
         $targetConfigPath = $configMode === 'local' ? self::localConfigPath() : self::configPath();
         self::ensureDir(dirname($targetConfigPath));
         $allowOverwrite = ((string)($input['allow_overwrite_config'] ?? '') === '1');
+        $createdConfig = false;
         if (!is_file($targetConfigPath)) {
             self::writeConfigAtomic($targetConfigPath, $config);
+            $createdConfig = true;
             $log('Arquivo de configuração criado: ' . str_replace(self::basePath() . '/', '', $targetConfigPath));
         } elseif ($allowOverwrite) {
             self::writeConfigAtomic($targetConfigPath, $config);
@@ -72,14 +80,23 @@ class Installer
             $log('Arquivo de configuração existente preservado: ' . str_replace(self::basePath() . '/', '', $targetConfigPath));
         }
 
-        // Recarrega a configuração recém-gravada para que Database/SchemaManager usem o banco informado
-        Config::reload();
-        Database::reset();
-        $pdo = self::connect($config['database'], $log);
-        self::importSchema($pdo, $log);
-        self::runSchemaEnsure($log);
-        self::createAdminIfNeeded($input, $log);
-        self::ensureRuntimeDirs($log);
+        try {
+            // Recarrega a configuração recém-gravada para que Database/SchemaManager usem o banco informado
+            Config::reload();
+            Database::reset();
+            self::importSchema($pdo, $log);
+            self::runSchemaEnsure($log);
+            self::createAdminIfNeeded($input, $log);
+            self::ensureRuntimeDirs($log);
+        } catch (Throwable $e) {
+            // Desfaz o config.php criado nesta tentativa, para o instalador não ficar bloqueado
+            if ($createdConfig && is_file($targetConfigPath)) {
+                @unlink($targetConfigPath);
+                Config::reload();
+                $log('Configuração desfeita. Corrija o problema e tente instalar novamente.');
+            }
+            throw $e;
+        }
 
         self::writeInstallLock($log);
         $log('Instalação concluída com sucesso.');
@@ -209,6 +226,22 @@ class Installer
     {
         $log('Executando migrações incrementais.');
         SchemaManager::ensure();
+    }
+
+    private static function validateAdminInput(array $input): void
+    {
+        $email = trim((string)($input['admin_email'] ?? ''));
+        $password = (string)($input['admin_password'] ?? '');
+        if ($email === '' || $password === '') {
+            throw new RuntimeException('Informe e-mail e senha do administrador inicial.');
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new RuntimeException('E-mail do administrador inválido.');
+        }
+        $policy = PasswordPolicy::validate($password);
+        if (!$policy['valid']) {
+            throw new RuntimeException('Senha do administrador fraca: ' . implode(' ', $policy['errors'] ?? []));
+        }
     }
 
     private static function createAdminIfNeeded(array $input, callable $log): void

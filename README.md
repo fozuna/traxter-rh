@@ -41,6 +41,13 @@ Tudo fica em **`app/config/config.php`** (modelo: `app/config/config.example.php
 
 Domínios `.test`, `.local` e `localhost` são tratados como desenvolvimento (erros visíveis). Em produção, os erros vão para `storage/logs/`.
 
+## Se a instalação falhar
+
+O instalador valida senha do admin e conexão com o banco **antes** de gravar qualquer arquivo, e desfaz o `config.php` se algo falhar no meio. Se mesmo assim o `install.php` ficar bloqueado sem administrador criado:
+
+1. No Gerenciador de Arquivos, apague `app/config/config.php` (e `storage/install.done`, se existir).
+2. Abra o `install.php` de novo e repita. As tabelas já criadas são reaproveitadas, sem perda.
+
 ## Configurar a instalação para um cliente
 
 Cada cliente tem sua instalação e seu `app/config/config.php`. A identidade visual fica na seção `cliente`:
