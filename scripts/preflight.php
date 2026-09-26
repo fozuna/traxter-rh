@@ -35,6 +35,12 @@ $add(
         ? ($isProd ? 'Configure storage.path para uma pasta fora do site: ' . $storageReal : 'Aceitável em desenvolvimento.')
         : $storageReal
 );
+$rawCfg = @include BASE_PATH . '/app/config/config.php';
+$add(
+    'Sem senha em texto puro no config.php',
+    !($hasPlainSupervisor = is_array($rawCfg) && !empty($rawCfg['security']['supervisor_password'])),
+    $hasPlainSupervisor ? 'Remova a linha security.supervisor_password do config.php (a senha do supervisor fica só no banco).' : ''
+);
 $add('Pasta de currículos gravável', is_dir(STORAGE_PATH . '/resumes') && is_writable(STORAGE_PATH . '/resumes'));
 $db = $app['database'] ?? [];
 $dsn = (string)($db['dsn'] ?? '');

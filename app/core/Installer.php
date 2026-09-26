@@ -87,6 +87,7 @@ class Installer
             self::importSchema($pdo, $log);
             self::runSchemaEnsure($log);
             self::createAdminIfNeeded($input, $log);
+            self::createSupervisorIfNeeded($input, $log);
             self::ensureRuntimeDirs($log);
         } catch (Throwable $e) {
             // Desfaz o config.php criado nesta tentativa, para o instalador não ficar bloqueado
@@ -154,7 +155,6 @@ class Installer
             ],
             'security' => [
                 'supervisor_email' => $supervisorEmail,
-                'supervisor_password' => $supervisorPassword,
             ],
             'mail' => [
                 'enabled' => true,
@@ -247,6 +247,22 @@ class Installer
         SchemaManager::ensure();
     }
 
+    private static function createSupervisorIfNeeded(array $input, callable $log): void
+    {
+        $email = trim((string)($input['supervisor_email'] ?? ''));
+        $password = (string)($input['supervisor_password'] ?? '');
+        if ($email === '' || $password === '') {
+            return;
+        }
+        if (User::findByEmail($email)) {
+            $log('Supervisor já existe: ' . $email . ' (senha mantida).');
+            User::ensureSupervisorAccount('Supervisor', $email);
+            return;
+        }
+        User::ensureSupervisor('Supervisor', $email, $password);
+        $log('Usuário supervisor criado: ' . $email . ' (senha guardada só como hash no banco).');
+    }
+
     private static function validateAdminInput(array $input): void
     {
         $email = trim((string)($input['admin_email'] ?? ''));
@@ -260,6 +276,20 @@ class Installer
         $policy = PasswordPolicy::validate($password);
         if (!$policy['valid']) {
             throw new RuntimeException('Senha do administrador fraca: ' . implode(' ', $policy['errors'] ?? []));
+        }
+        $supEmail = trim((string)($input['supervisor_email'] ?? ''));
+        $supPassword = (string)($input['supervisor_password'] ?? '');
+        if ($supEmail !== '' && !filter_var($supEmail, FILTER_VALIDATE_EMAIL)) {
+            throw new RuntimeException('E-mail do supervisor inválido.');
+        }
+        if ($supPassword !== '') {
+            $policy = PasswordPolicy::validate($supPassword);
+            if (!$policy['valid']) {
+                throw new RuntimeException('Senha do supervisor fraca: ' . implode(' ', $policy['errors'] ?? []));
+            }
+        }
+        if ($supEmail !== '' && strtolower($supEmail) === strtolower($email)) {
+            throw new RuntimeException('Use e-mails diferentes para o administrador e o supervisor.');
         }
     }
 

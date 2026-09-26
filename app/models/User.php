@@ -41,6 +41,25 @@ class User
         return (int)Database::conn()->lastInsertId();
     }
 
+    /**
+     * Garante a conta Supervisor SEM mexer na senha de uma conta existente.
+     * Se precisar criar, a conta nasce com senha aleatória inutilizável; o acesso
+     * é definido pelo link de redefinição enviado ao e-mail do supervisor.
+     * @return array{id:int, created:bool}
+     */
+    public static function ensureSupervisorAccount(string $nome, string $email): array
+    {
+        $existing = self::findByEmail($email);
+        if ($existing) {
+            $sql = 'UPDATE usuarios SET role = ?, is_supervisor = 1, email_verified_at = COALESCE(email_verified_at, NOW()) WHERE id = ?';
+            Database::conn()->prepare($sql)->execute(['admin', $existing->id]);
+            return ['id' => (int)$existing->id, 'created' => false];
+        }
+        $unusable = password_hash(bin2hex(random_bytes(32)), PASSWORD_BCRYPT);
+        return ['id' => self::createSupervisor($nome, $email, $unusable), 'created' => true];
+    }
+
+    /** Uso restrito ao instalador: cria/atualiza o supervisor com a senha informada na instalação. */
     public static function ensureSupervisor(string $nome, string $email, string $password): int
     {
         $existing = self::findByEmail($email);

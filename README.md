@@ -135,6 +135,13 @@ php scripts/migrate_resumes.php --apply    # move, renomeia e atualiza o banco
 - **A pedido do candidato:** no detalhe da candidatura, um administrador usa *Anonimizar candidato* (exige digitar ANONIMIZAR). A ação fica registrada na auditoria.
 - Anonimizar remove nome, e-mail, telefone, CPF, experiência, notas, observações do histórico, registro de consentimento e o arquivo do currículo. A candidatura continua nas estatísticas, sem identificar ninguém, e a pessoa pode se candidatar de novo.
 
+## Supervisor (conta da TRAXTER em cada cliente)
+
+- Conta protegida: nenhum admin do cliente consegue apagá-la ou rebaixá-la.
+- Criada pelo instalador com a senha informada, que fica **só como hash no banco**. O `config.php` guarda apenas `security.supervisor_email`.
+- Em instalações sem supervisor, um admin usa *Usuários → Garantir usuário Supervisor*: a conta é criada e o supervisor recebe por e-mail um link (24 h) para definir a senha. Se a conta já existe, só as permissões são restauradas; a senha nunca é alterada.
+- Instalações antigas: apague a linha `supervisor_password` do `config.php` (o `preflight` avisa).
+
 ## Regras de segurança do repositório
 
 - **Nunca** versionar `app/config/config.php`, dumps de banco ou arquivos de `storage/` e `uploads/`.

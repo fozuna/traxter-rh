@@ -8,9 +8,10 @@ require_once __DIR__ . '/../../app/core/bootstrap.php';
 
 $cfg = Config::app();
 $supervisorEmail = $cfg['security']['supervisor_email'];
-$supervisorPassword = $cfg['security']['supervisor_password'];
-
-$supervisorId = User::ensureSupervisor('Supervisor', $supervisorEmail, $supervisorPassword);
+if (!filter_var((string)$supervisorEmail, FILTER_VALIDATE_EMAIL)) {
+    $supervisorEmail = 'supervisor_' . time() . '@example.test';
+}
+$supervisorId = User::ensureSupervisorAccount('Supervisor', $supervisorEmail)['id'];
 $supervisor = User::findById($supervisorId);
 if (!$supervisor || (int)$supervisor->is_supervisor !== 1) {
     fwrite(STDERR, "Falha: Supervisor não foi garantido corretamente.\n");

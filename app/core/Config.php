@@ -45,7 +45,6 @@ class Config
                 'csrf_key' => 'csrf_token',
                 'session_name' => 'TRXRHSESSID',
                 'supervisor_email' => '',
-                'supervisor_password' => '',
                 'allowed_upload_mime' => ['application/pdf'],
                 'max_upload_bytes' => 5 * 1024 * 1024,
                 'allowed_image_mime' => ['image/png', 'image/jpeg', 'image/webp'],

@@ -44,7 +44,7 @@ $base = Config::app()['base_url'] ?? '';
   <form class="mt-6 pt-4 border-t" method="post" action="<?= $base ?>/admin/usuarios/supervisor/garantir">
     <input type="hidden" name="csrf" value="<?= Security::e($csrf ?? '') ?>">
     <h3 class="text-sm font-semibold text-gray-700 mb-2">Operação especial</h3>
-    <p class="text-xs text-gray-500 mb-3">Cria ou atualiza o usuário Supervisor protegido com permissões irrestritas.</p>
+    <p class="text-xs text-gray-500 mb-3">Cria o usuário Supervisor protegido (e-mail definido no config.php) ou restaura as permissões dele. Na criação, o supervisor recebe por e-mail um link para definir a própria senha; senhas existentes nunca são alteradas.</p>
     <button type="submit" class="bg-ctpblue text-white px-4 py-2 rounded hover:bg-ctdark">Garantir usuário Supervisor</button>
   </form>
 </div>
