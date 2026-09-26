@@ -25,6 +25,49 @@
     </div>
 </div>
 
+<?php
+  $alertas = $alertas ?? ['nao_triadas' => [], 'paradas' => []];
+  $blocos = [
+      ['titulo' => 'Aguardando triagem', 'dica' => 'na primeira etapa há mais de ' . (int)($diasTriagem ?? 3) . ' dias', 'itens' => $alertas['nao_triadas'], 'cor' => 'border-amber-400', 'badge' => 'bg-amber-100 text-amber-800'],
+      ['titulo' => 'Paradas na etapa', 'dica' => 'sem movimentação há mais de ' . (int)($diasParado ?? 7) . ' dias', 'itens' => $alertas['paradas'], 'cor' => 'border-red-400', 'badge' => 'bg-red-100 text-red-800'],
+  ];
+  $totalAlertas = count($alertas['nao_triadas']) + count($alertas['paradas']);
+?>
+<div class="responsive-panel mb-6">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-gray-800">Precisa de atenção</h2>
+        <?php if ($totalAlertas === 0): ?>
+            <span class="text-sm text-green-700 bg-green-50 border border-green-200 rounded-full px-3 py-1">Tudo em dia</span>
+        <?php endif; ?>
+    </div>
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <?php foreach ($blocos as $b): ?>
+        <div class="rounded-xl border-l-4 <?= $b['cor'] ?> bg-gray-50 p-4">
+            <div class="flex items-baseline justify-between gap-2">
+                <p class="font-semibold text-gray-800"><?= Security::e($b['titulo']) ?></p>
+                <span class="text-xs font-semibold rounded-full px-2 py-0.5 <?= $b['badge'] ?>"><?= count($b['itens']) ?><?= count($b['itens']) >= 10 ? '+' : '' ?></span>
+            </div>
+            <p class="text-xs text-gray-500 mb-3"><?= Security::e($b['dica']) ?></p>
+            <?php if (empty($b['itens'])): ?>
+                <p class="text-sm text-gray-500">Nenhuma candidatura nesta situação.</p>
+            <?php else: ?>
+                <ul class="divide-y divide-gray-200">
+                    <?php foreach ($b['itens'] as $it): ?>
+                    <li class="py-2 flex items-center justify-between gap-3">
+                        <a href="<?= $base ?>/admin/candidaturas/<?= (int)$it['id'] ?>" class="min-w-0">
+                            <span class="block truncate font-medium text-ctpblue hover:underline"><?= Security::e($it['nome']) ?></span>
+                            <span class="block truncate text-xs text-gray-500"><?= Security::e((string)$it['vaga_titulo']) ?> · <?= Security::e((string)$it['etapa']) ?></span>
+                        </a>
+                        <span class="shrink-0 text-xs font-semibold text-gray-700"><?= (int)$it['dias'] ?> dias</span>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+        </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+
 <div class="responsive-panel mb-6">
     <h2 class="text-lg font-semibold text-gray-800 mb-4">Pipeline de Seleção</h2>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">

@@ -24,7 +24,16 @@ class AdminController extends Controller
             }
         }
         
+        try {
+            $alertas = Alertas::pendencias(10);
+        } catch (\Throwable $e) {
+            Logger::warning('Falha ao calcular alertas', ['erro' => $e->getMessage()]);
+            $alertas = ['nao_triadas' => [], 'paradas' => []];
+        }
         $this->view->render('admin/dashboard', [
+            'alertas' => $alertas,
+            'diasTriagem' => Alertas::diasTriagem(),
+            'diasParado' => Alertas::diasParado(),
             'vagasAtivas' => $vagasAtivas,
             'totalCandidaturas' => $totalCandidaturas,
             'stats' => $stats,

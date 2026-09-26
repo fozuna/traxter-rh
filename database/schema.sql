@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `candidaturas` (
   `indicacao_pagamento_status` varchar(20) NOT NULL DEFAULT 'pendente',
   `anonimizado_em` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `cpf` (`cpf`),
+  KEY `idx_cand_cpf_vaga` (`cpf`,`vaga_id`),
   KEY `fk_cand_vaga` (`vaga_id`),
   KEY `idx_candidaturas_stage_id` (`stage_id`),
   CONSTRAINT `fk_cand_stage` FOREIGN KEY (`stage_id`) REFERENCES `pipeline_stages` (`id`) ON DELETE SET NULL,

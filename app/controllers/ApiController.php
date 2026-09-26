@@ -23,7 +23,15 @@ class ApiController
             return;
         }
 
-        $exists = Candidatura::cpfExists($cpf);
-        echo json_encode(['exists' => $exists]);
+        $vagaId = (int)($input['vaga_id'] ?? 0);
+        if ($vagaId <= 0) {
+            echo json_encode(['exists' => false]);
+            return;
+        }
+        $liberaEm = Candidatura::bloqueioReaplicacao($cpf, $vagaId);
+        echo json_encode([
+            'exists' => $liberaEm !== null,
+            'libera_em' => $liberaEm !== null ? date('d/m/Y', strtotime($liberaEm)) : null,
+        ]);
     }
 }

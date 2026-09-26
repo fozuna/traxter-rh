@@ -77,6 +77,7 @@ Cada cliente tem sua instalação e seu `app/config/config.php`. A identidade vi
 | `php scripts/setup_full.php` | Setup local completo |
 | `php scripts/reset_password_cli.php <email> <nova_senha>` | Redefinir senha (valida a política de senhas) |
 | `php scripts/preflight.php` | Checagem antes de publicar (inclui local dos arquivos privados) |
+| `php scripts/alertas_rh.php [--enviar]` | Resumo de candidaturas sem triagem ou paradas (agendar no cron) |
 | `php scripts/lgpd_retencao.php [--apply]` | Anonimiza candidaturas com prazo de guarda vencido (agendar no cron) |
 | `php scripts/migrate_resumes.php [--apply]` | Migra currículos de instalações antigas para o padrão seguro |
 | `for %f in (tests\php\*.php) do php %f` | Testes PHP (usam o banco configurado) |
@@ -134,6 +135,13 @@ php scripts/migrate_resumes.php --apply    # move, renomeia e atualiza o banco
   `/usr/bin/php /home/USUARIO/domains/DOMINIO/public_html/PASTA/scripts/lgpd_retencao.php --apply`
 - **A pedido do candidato:** no detalhe da candidatura, um administrador usa *Anonimizar candidato* (exige digitar ANONIMIZAR). A ação fica registrada na auditoria.
 - Anonimizar remove nome, e-mail, telefone, CPF, experiência, notas, observações do histórico, registro de consentimento e o arquivo do currículo. A candidatura continua nas estatísticas, sem identificar ninguém, e a pessoa pode se candidatar de novo.
+
+## Regras do processo seletivo e alertas
+
+- **Reaplicação:** o candidato pode concorrer a várias vagas ao mesmo tempo; na **mesma vaga**, só após `recrutamento.reaplicacao_meses` (padrão 6) desde a última candidatura.
+- **Alertas no painel** (*Precisa de atenção*): candidaturas aguardando triagem (primeira etapa há mais de `alerta_triagem_dias`, padrão 3) e paradas na mesma etapa (sem movimentação há mais de `alerta_parado_dias`, padrão 7). Etapas finais (Contratado, Rejeitado) não entram.
+- **Resumo diário por e-mail** para o RH (`mail.to_hr`), só quando houver pendência. Cron em dias úteis às 8h:
+  `0 8 * * 1-5  /usr/bin/php /home/USUARIO/domains/.../scripts/alertas_rh.php --enviar`
 
 ## E-mails (avisos de candidatura e recuperação de senha)
 

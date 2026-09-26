@@ -70,8 +70,10 @@ class HomeController extends Controller
             $this->renderFormError($vaga, 'CPF inválido (formato ou dígitos verificadores).', 422);
             return;
         }
-        if (Candidatura::cpfExists($cpf)) {
-            $this->renderFormError($vaga, 'Você já possui uma candidatura ativa. Aguarde o resultado antes de se candidatar novamente.', 422);
+        $liberaEm = Candidatura::bloqueioReaplicacao($cpf, (int)$id);
+        if ($liberaEm !== null) {
+            $this->renderFormError($vaga, 'Você já se candidatou a esta vaga. Poderá se candidatar novamente a ela a partir de '
+                . date('d/m/Y', strtotime($liberaEm)) . '. Enquanto isso, fique à vontade para concorrer a outras vagas.', 422);
             return;
         }
         // Consentimento LGPD (obrigatório)

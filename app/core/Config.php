@@ -32,6 +32,11 @@ class Config
             'storage' => [
                 'path' => ''
             ],
+            'recrutamento' => [
+                'reaplicacao_meses' => 6,     // mesma vaga só pode receber nova candidatura do mesmo CPF após N meses
+                'alerta_triagem_dias' => 3,   // candidatura na primeira etapa há mais de N dias = "não triada"
+                'alerta_parado_dias' => 7     // candidatura sem movimentação há mais de N dias = "parada"
+            ],
             'suporte' => [
                 'nome' => 'TRAXTER Sistemas e Automações',
                 'site' => 'https://traxter.com.br/',

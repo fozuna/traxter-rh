@@ -75,7 +75,7 @@
         <input type="text" name="cpf" id="cpf" maxlength="14" value="<?= Security::e($old['cpf'] ?? '') ?>" required data-cpf-input="1"
                class="mt-1 w-full border rounded px-3 py-2 shadow-sm focus:border-ctgreen focus:ring-1 focus:ring-ctgreen" 
                placeholder="000.000.000-00" />
-        <div id="cpf-error" data-cpf-error="exists" class="text-red-600 text-sm mt-1 hidden">Você já possui uma candidatura ativa. Aguarde o resultado antes de se candidatar novamente.</div>
+        <div id="cpf-error" data-cpf-error="exists" class="text-red-600 text-sm mt-1 hidden">Você já se candidatou a esta vaga recentemente.</div>
         <div id="cpf-invalid" data-cpf-error="invalid" class="text-red-600 text-sm mt-1 hidden">CPF inválido. Verifique os dígitos.</div>
       </div>
       <div>

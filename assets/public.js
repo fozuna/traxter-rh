@@ -251,7 +251,13 @@
           'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
         },
-        body: JSON.stringify({ cpf: cpfDigits }),
+        body: JSON.stringify({
+          cpf: cpfDigits,
+          vaga_id: (() => {
+            const m = String((cpfInput.form && cpfInput.form.getAttribute('action')) || '').match(/\/candidatar\/(\d+)/);
+            return m ? parseInt(m[1], 10) : 0;
+          })(),
+        }),
       });
 
       if (!res.ok) {
@@ -290,8 +296,11 @@
           try {
             const data = await checkCpfExists(digits);
             if (data && data.exists) {
+              if (cpfError && data.libera_em) {
+                cpfError.textContent = 'Você já se candidatou a esta vaga. Poderá se candidatar novamente a ela a partir de ' + data.libera_em + '.';
+              }
               setHidden(cpfError, false);
-              cpfInput.setCustomValidity('CPF já cadastrado');
+              cpfInput.setCustomValidity('Candidatura recente para esta vaga');
             } else {
               setHidden(cpfError, true);
               cpfInput.setCustomValidity('');

@@ -29,6 +29,12 @@ return [
     'storage' => [
         'path' => ''
     ],
+    // Regras do processo seletivo
+    'recrutamento' => [
+        'reaplicacao_meses' => 6,     // mesmo CPF na MESMA vaga só após N meses (outras vagas: liberado)
+        'alerta_triagem_dias' => 3,   // alerta: candidatura sem triagem há mais de N dias
+        'alerta_parado_dias' => 7     // alerta: candidatura parada na mesma etapa há mais de N dias
+    ],
     // Suporte exibido no manual do sistema
     'suporte' => [
         'nome' => 'TRAXTER Sistemas e Automações',

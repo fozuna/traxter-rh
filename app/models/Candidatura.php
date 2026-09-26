@@ -8,6 +8,7 @@ class Candidatura
             throw new InvalidArgumentException('Telefone inválido. Informe 11 dígitos (DDD + número).');
         }
         self::ensureCpfColumn();
+        self::ensureCpfIndex();
         self::ensureStageColumn();
         self::ensureIndicacaoColumns();
         $hasNomeIndicador = self::hasColumn('candidaturas', 'indicacao_colaborador_nome');
@@ -202,10 +203,7 @@ class Candidatura
             if (!$exists) {
                 // Para migrações em bancos já existentes, adiciona como NULL para evitar falhas
                 $db->exec('ALTER TABLE candidaturas ADD COLUMN cpf VARCHAR(11) NULL');
-                // Opcional: tentar criar índice único se possível
-                try {
-                    $db->exec('ALTER TABLE candidaturas ADD UNIQUE INDEX uq_candidaturas_cpf (cpf)');
-                } catch (\Throwable $e2) { /* ignora se já existir ou se houver duplicatas */ }
+
             }
         } catch (\Throwable $e) {
             // Silencia para não quebrar fluxo
@@ -260,6 +258,57 @@ class Candidatura
     {
         $m = self::statusMap();
         return $m[$code]['text'] ?? '#111111';
+    }
+
+    /**
+     * Regra de reaplicação: o candidato pode concorrer a várias vagas ao mesmo tempo,
+     * mas não à MESMA vaga antes de recrutamento.reaplicacao_meses (padrão 6) desde a última candidatura.
+     * Retorna null se pode se candidatar, ou a data (Y-m-d) a partir da qual poderá.
+     */
+    public static function bloqueioReaplicacao(string $cpf, int $vagaId): ?string
+    {
+        self::ensureCpfIndex();
+        $meses = max(0, (int)(Config::get()['recrutamento']['reaplicacao_meses'] ?? 6));
+        $stmt = Database::conn()->prepare(
+            'SELECT MAX(created_at) FROM candidaturas WHERE cpf = ? AND vaga_id = ?'
+        );
+        $stmt->execute([$cpf, $vagaId]);
+        $ultima = $stmt->fetchColumn();
+        if (!$ultima) {
+            return null;
+        }
+        $liberaEm = (new DateTimeImmutable((string)$ultima))->modify("+{$meses} months");
+        return $liberaEm > new DateTimeImmutable() ? $liberaEm->format('Y-m-d') : null;
+    }
+
+    /** Remove o UNIQUE antigo de CPF (que impedia várias candidaturas) e cria índice (cpf, vaga_id). */
+    private static function ensureCpfIndex(): void
+    {
+        static $done = false;
+        if ($done) {
+            return;
+        }
+        $done = true;
+        try {
+            $db = Database::conn();
+            $uniques = $db->query(
+                "SELECT DISTINCT INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS
+                 WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'candidaturas'
+                   AND COLUMN_NAME = 'cpf' AND NON_UNIQUE = 0"
+            )->fetchAll(PDO::FETCH_COLUMN);
+            foreach ($uniques as $idx) {
+                $db->exec('ALTER TABLE candidaturas DROP INDEX `' . str_replace('`', '', (string)$idx) . '`');
+            }
+            $has = (int)$db->query(
+                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+                 WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'candidaturas' AND INDEX_NAME = 'idx_cand_cpf_vaga'"
+            )->fetchColumn();
+            if ($has === 0) {
+                $db->exec('ALTER TABLE candidaturas ADD INDEX idx_cand_cpf_vaga (cpf, vaga_id)');
+            }
+        } catch (\Throwable $e) {
+            Logger::warning('Falha ao ajustar índice de CPF', ['erro' => $e->getMessage()]);
+        }
     }
 
     public static function cpfExists(string $cpf): bool
