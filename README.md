@@ -135,6 +135,13 @@ php scripts/migrate_resumes.php --apply    # move, renomeia e atualiza o banco
 - **A pedido do candidato:** no detalhe da candidatura, um administrador usa *Anonimizar candidato* (exige digitar ANONIMIZAR). A ação fica registrada na auditoria.
 - Anonimizar remove nome, e-mail, telefone, CPF, experiência, notas, observações do histórico, registro de consentimento e o arquivo do currículo. A candidatura continua nas estatísticas, sem identificar ninguém, e a pessoa pode se candidatar de novo.
 
+## E-mails (avisos de candidatura e recuperação de senha)
+
+- Configure **SMTP** em `mail.smtp` no `config.php`. Sem SMTP o sistema usa `mail()` do PHP, que costuma não entregar ou cair no spam.
+- Hostinger: crie a caixa do remetente em *E-mails* (ex.: `no-reply@seudominio.com.br`) e use `smtp.hostinger.com`, porta `465`, `secure` = `ssl`, usuário e senha dessa caixa.
+- E-mail do domínio em outro provedor (Google Workspace, Zoho etc.): use o SMTP desse provedor (Google: `smtp.gmail.com`, porta `587`, `secure` = `tls`, senha de app).
+- Diagnóstico: painel → **Teste de e-mail** (somente admin) mostra se enviou e, se falhou, a resposta exata do servidor.
+
 ## Supervisor (conta da TRAXTER em cada cliente)
 
 - Conta protegida: nenhum admin do cliente consegue apagá-la ou rebaixá-la.

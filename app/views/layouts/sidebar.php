@@ -46,6 +46,10 @@ if ($publicJobsUrl === '') {
         <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v16M4 12h16"/></svg>
         <span class="sidebar-link-label">Usuários</span>
       </a>
+      <a href="<?= $base ?>/admin/email-teste" class="sidebar-link" data-admin-menu-close="1">
+        <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+        <span class="sidebar-link-label">Teste de e-mail</span>
+      </a>
       <?php endif; ?>
       <a href="<?= $base ?>/admin/manual" class="sidebar-link" data-admin-menu-close="1">
         <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M4 4.5A2.5 2.5 0 016.5 7H20"/><path d="M6.5 7H20v12H6.5A2.5 2.5 0 014 16.5v-12z"/></svg>

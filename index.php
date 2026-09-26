@@ -65,6 +65,8 @@ try {
     $router->post('/admin/candidaturas/{id}/atualizar', [AdminCandidaturasController::class, 'update']);
     $router->post('/admin/candidaturas/{id}/indicacao', [AdminCandidaturasController::class, 'updateIndicacao']);
     $router->post('/admin/candidaturas/{id}/anonimizar', [AdminCandidaturasController::class, 'anonimizar']);
+    $router->get('/admin/email-teste', [AdminEmailController::class, 'index']);
+    $router->post('/admin/email-teste', [AdminEmailController::class, 'send']);
     $router->get('/admin/indicacoes', [AdminIndicacoesController::class, 'index']);
     $router->get('/admin/indicacoes/export', [AdminIndicacoesController::class, 'export']);
     $router->post('/admin/indicacoes/{id}/pagar', [AdminIndicacoesController::class, 'markPago']);

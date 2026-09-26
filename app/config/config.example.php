@@ -49,6 +49,15 @@ return [
         'max_image_bytes' => 2 * 1024 * 1024
     ],
     'mail' => [
+        // SMTP (recomendado). Vazio = usa mail() do PHP, que costuma cair no spam ou não entregar.
+        // Hostinger: host smtp.hostinger.com, porta 465, secure 'ssl', usuário/senha da caixa do remetente.
+        'smtp' => [
+            'host' => '',
+            'port' => 465,
+            'secure' => 'ssl',
+            'user' => '',
+            'pass' => ''
+        ],
         'enabled' => true,
         'from' => 'no-reply@seu-dominio.com.br',
         'to_hr' => 'rh@seu-dominio.com.br',
