@@ -26,7 +26,8 @@ $app = Config::app();
 // Currículos e logs devem ficar fora da pasta pública em produção
 $storageReal = realpath(STORAGE_PATH) ?: STORAGE_PATH;
 $baseReal = realpath(BASE_PATH) ?: BASE_PATH;
-$storageInsideWeb = str_starts_with($storageReal . DIRECTORY_SEPARATOR, $baseReal . DIRECTORY_SEPARATOR);
+$storageInsideWeb = str_starts_with($storageReal . DIRECTORY_SEPARATOR, $baseReal . DIRECTORY_SEPARATOR)
+    || (bool)preg_match('#[/\\\\](public_html|www|htdocs|httpdocs)([/\\\\]|$)#i', $storageReal);
 $isProd = ($app['env'] ?? 'production') === 'production';
 $add(
     'Arquivos privados fora da pasta pública',

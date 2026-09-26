@@ -262,7 +262,11 @@ class Installer
     public static function suggestStoragePath(): string
     {
         $base = str_replace('\\', '/', self::basePath());
-        $home = preg_match('#^(/home/[^/]+)#', $base, $m) ? $m[1] : dirname($base, 2);
+        if (preg_match('#^(/home/[^/]+/domains/[^/]+)/public_html#', $base, $m)) {
+            $home = $m[1]; // Hostinger: ao lado de public_html, visível no Gerenciador de Arquivos
+        } else {
+            $home = preg_match('#^(/home/[^/]+)#', $base, $m) ? $m[1] : dirname($base, 2);
+        }
         $host = strtolower((string)($_SERVER['HTTP_HOST'] ?? basename($base)));
         $slug = trim((string)preg_replace('/[^a-z0-9]+/', '-', preg_replace('/:\d+$/', '', $host)), '-');
         return rtrim($home, '/') . '/traxter-rh-storage/' . ($slug !== '' ? $slug : 'instalacao');
@@ -280,6 +284,9 @@ class Installer
         $isAbsolute = str_starts_with($path, '/') || (bool)preg_match('#^[A-Za-z]:/#', $path);
         if (!$isAbsolute || str_contains($path, '..')) {
             throw new RuntimeException('Pasta privada: informe um caminho absoluto, sem "..".');
+        }
+        if (preg_match('#/(public_html|www|htdocs|httpdocs)(/|$)#i', $path)) {
+            throw new RuntimeException('Pasta privada não pode ficar dentro de public_html (ficaria acessível pela internet). Use, por exemplo, ' . self::suggestStoragePath());
         }
         $base = rtrim(str_replace('\\', '/', (string)realpath(self::basePath())), '/');
         if (str_starts_with($path . '/', $base . '/')) {

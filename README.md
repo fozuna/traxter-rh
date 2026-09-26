@@ -183,7 +183,7 @@ Exemplo: `rh.traxter.com.br`.
 3. **PHP:** *MultiPHP Manager* → PHP 8.1 ou superior, com `pdo_mysql`, `mbstring` e `fileinfo`.
 4. **Banco:** *MySQL Databases* → criar banco e usuário, e dar **todas as permissões** ao usuário no banco.
 5. **Arquivos:** no GitHub, *Code → Download ZIP*; no *Gerenciador de Arquivos*, envie e extraia o ZIP **dentro** da raiz do subdomínio (os arquivos `index.php` e `.htaccess` devem ficar direto na raiz).
-6. **Pasta privada:** crie `/home/USUARIO/traxter-rh-storage` (fora de `public_html`).
+6. **Pasta privada:** crie `/home/USUARIO/domains/DOMINIO/traxter-rh-storage` (ao lado de `public_html`, **nunca dentro**).
 7. **Instalação:** acesse `https://rh.traxter.com.br/install.php`, informe o DSN `mysql:host=localhost;dbname=BANCO;charset=utf8mb4`, usuário e senha do banco, e-mails e o administrador (senha com 12+ caracteres, maiúscula, minúscula, número e símbolo). Ao concluir, o instalador se bloqueia e se remove.
 8. **Ajustes finais** em `app/config/config.php` (pelo Gerenciador de Arquivos): seção `cliente` (nome, logo, cores) e `'storage' => ['path' => '/home/USUARIO/traxter-rh-storage']`.
 9. **Conferência:** `https://rh.traxter.com.br/login` e `https://rh.traxter.com.br/vagas`. Teste que `https://rh.traxter.com.br/app/config/config.php` e `https://rh.traxter.com.br/database/schema.sql` retornam **403**.
