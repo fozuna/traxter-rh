@@ -4,9 +4,9 @@ $versao = trim((string)($app['version'] ?? ''));
 $releaseDate = trim((string)($app['release_date'] ?? ''));
 ?>
 <style>
-  .manual-wrap{max-width:1100px;margin:0 auto;color:#0d1321}
-  .manual-card{background:#fff;border:1px solid #3e5c76;border-radius:16px;box-shadow:0 8px 24px rgba(13,19,33,.08)}
-  .manual-hero{padding:28px;background:linear-gradient(135deg,#0d1321,#1d2d44);color:#fff}
+  .manual-wrap{max-width:1100px;margin:0 auto;color:var(--ctdark)}
+  .manual-card{background:#fff;border:1px solid var(--ctlight);border-radius:16px;box-shadow:0 8px 24px rgba(13,19,33,.08)}
+  .manual-hero{padding:28px;background:linear-gradient(135deg,var(--ctdark),var(--ctgreen));color:#fff}
   .manual-kpi{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:12px;padding:12px}
   .manual-kpi-label{font-size:12px;opacity:.9}
   .manual-kpi-value{font-size:15px;font-weight:700;margin-top:4px}
@@ -14,26 +14,26 @@ $releaseDate = trim((string)($app['release_date'] ?? ''));
   .manual-grid-3{grid-template-columns:2fr 1fr}
   .manual-grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
   .manual-title{font-size:34px;line-height:1.15;font-weight:800;letter-spacing:-.01em}
-  .manual-subtitle{font-size:17px;line-height:1.6;color:#0d1321}
-  .manual-h2{font-size:24px;font-weight:800;color:#0d1321}
-  .manual-h3{font-size:18px;font-weight:800;color:#0d1321}
-  .manual-p{font-size:16px;line-height:1.7;color:#0d1321}
-  .manual-muted{font-size:14px;color:#3e5c76}
-  .manual-link{color:#1d2d44;font-weight:700;text-decoration:none}
+  .manual-subtitle{font-size:17px;line-height:1.6;color:var(--ctdark)}
+  .manual-h2{font-size:24px;font-weight:800;color:var(--ctdark)}
+  .manual-h3{font-size:18px;font-weight:800;color:var(--ctdark)}
+  .manual-p{font-size:16px;line-height:1.7;color:var(--ctdark)}
+  .manual-muted{font-size:14px;color:var(--ctlight)}
+  .manual-link{color:var(--ctgreen);font-weight:700;text-decoration:none}
   .manual-link:hover{text-decoration:underline}
   .manual-section{padding:20px}
-  .manual-chip{display:inline-block;background:#3e5c76;color:#fff;border:1px solid #1d2d44;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700}
+  .manual-chip{display:inline-block;background:var(--ctlight);color:#fff;border:1px solid var(--ctgreen);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700}
   .manual-accordion{display:flex;flex-direction:column;gap:14px}
   .manual-details summary{list-style:none;cursor:pointer;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px}
   .manual-details summary::-webkit-details-marker{display:none}
   .manual-summary-left{display:flex;align-items:center;gap:10px}
-  .manual-icon{width:22px;height:22px;min-width:22px;display:inline-block;color:#1d2d44}
+  .manual-icon{width:22px;height:22px;min-width:22px;display:inline-block;color:var(--ctgreen)}
   .manual-details[open] .manual-chevron{transform:rotate(90deg)}
-  .manual-chevron{width:18px;height:18px;color:#3e5c76;transition:transform .2s ease}
+  .manual-chevron{width:18px;height:18px;color:var(--ctlight);transition:transform .2s ease}
   .manual-content{padding:0 20px 20px}
-  .manual-block{border:1px solid #3e5c76;background:#fff;border-radius:12px;padding:14px}
+  .manual-block{border:1px solid var(--ctlight);background:#fff;border-radius:12px;padding:14px}
   .manual-list{margin:8px 0 0 0;padding-left:18px}
-  .manual-list li{margin:5px 0;color:#0d1321}
+  .manual-list li{margin:5px 0;color:var(--ctdark)}
   @media (max-width:960px){
     .manual-grid-3,.manual-grid-2{grid-template-columns:1fr}
     .manual-title{font-size:30px}
@@ -57,21 +57,21 @@ $releaseDate = trim((string)($app['release_date'] ?? ''));
     <div class="manual-grid manual-grid-2" style="margin-top:16px">
       <div class="manual-kpi"><div class="manual-kpi-label">Acesso</div><div class="manual-kpi-value">Usuários autenticados</div></div>
       <div class="manual-kpi"><div class="manual-kpi-label">Base de conteúdo</div><div class="manual-kpi-value">Módulos reais do painel</div></div>
-      <div class="manual-kpi"><div class="manual-kpi-label">Contato rápido</div><a class="manual-link" style="color:#fff;text-decoration:underline" href="https://wa.me/5567993256260" target="_blank" rel="noopener noreferrer">(67) 99325-6260</a></div>
-      <div class="manual-kpi"><div class="manual-kpi-label">Canal</div><a class="manual-link" style="color:#fff;text-decoration:underline" href="https://wa.me/5567993256260" target="_blank" rel="noopener noreferrer">wa.me/5567993256260</a></div>
+      <div class="manual-kpi"><div class="manual-kpi-label">Contato rápido</div><a class="manual-link" style="color:#fff;text-decoration:underline" href="<?= Security::e(Brand::support()['whatsapp_url']) ?>" target="_blank" rel="noopener noreferrer"><?= Security::e(Brand::support()['whatsapp_label']) ?></a></div>
+      <div class="manual-kpi"><div class="manual-kpi-label">Canal</div><a class="manual-link" style="color:#fff;text-decoration:underline" href="<?= Security::e(Brand::support()['whatsapp_url']) ?>" target="_blank" rel="noopener noreferrer">wa.me/<?= Security::e(Brand::support()['whatsapp']) ?></a></div>
     </div>
   </section>
 
   <section class="manual-grid manual-grid-3" style="margin-top:18px">
     <article class="manual-card manual-section">
       <h2 class="manual-h2">Sobre o sistema</h2>
-      <p class="manual-p" style="margin-top:8px">O Portal RH da <img src="<?= $base ?>/assets/logo-escura.png" alt="TRAXTER. - Recrutamento e Seleção" class="h-4 inline align-middle"> concentra operações de recrutamento em um fluxo único: publicação de vagas, recebimento de candidaturas, acompanhamento por etapas no pipeline, gestão de benefícios e administração de usuários com perfis de acesso.</p>
+      <p class="manual-p" style="margin-top:8px">O Portal RH da <strong><?= Security::e(Brand::clientName()) ?></strong> concentra operações de recrutamento em um fluxo único: publicação de vagas, recebimento de candidaturas, acompanhamento por etapas no pipeline, gestão de benefícios e administração de usuários com perfis de acesso.</p>
       <p class="manual-p" style="margin-top:8px">As funcionalidades principais incluem painel com indicadores, filtros por vaga/etapa/período, movimentação no kanban, histórico de alterações e download de currículos com nome otimizado por candidato e vaga.</p>
     </article>
     <article class="manual-card manual-section">
       <h2 class="manual-h2">Sobre a empresa</h2>
-      <p class="manual-p" style="margin-top:8px">Desenvolvedor: <a href="https://traxter.com.br/" target="_blank"><strong>TRAXTER Sistemas e Automações</strong></a>.</p>
-      <p class="manual-muted" style="margin-top:8px">Ecossistemas digitais de alta performance para empresas que exigem escalabilidade, governança e eficiência operacional.</p>
+      <p class="manual-p" style="margin-top:8px">Desenvolvedor: <a href="<?= Security::e(Brand::support()['site']) ?>" target="_blank" rel="noopener noreferrer"><strong><?= Security::e(Brand::support()['nome']) ?></strong></a>.</p>
+      <p class="manual-muted" style="margin-top:8px">Automação com IA, WhatsApp e sistemas sob medida para empresas.</p>
       <p class="manual-muted" style="margin-top:8px">Desenvolvimento de plataformas web e mobile sob medida, focadas em resolver dores específicas da sua operação.</p>
     </article>
   </section>
@@ -81,7 +81,7 @@ $releaseDate = trim((string)($app['release_date'] ?? ''));
     <div class="manual-grid manual-grid-2" style="margin-top:12px">
       <div class="manual-block"><p class="manual-muted">Versão</p><p class="manual-p" style="font-weight:700"><?= Security::e($versao !== '' ? $versao : 'não informada na configuração') ?></p></div>
       <div class="manual-block"><p class="manual-muted">Data de release</p><p class="manual-p" style="font-weight:700"><?= Security::e($releaseDate !== '' ? $releaseDate : 'não informada na configuração') ?></p></div>
-      <div class="manual-block"><p class="manual-muted">Canal de suporte</p><a class="manual-link" href="https://wa.me/5567993256260" target="_blank" rel="noopener noreferrer">WhatsApp: (67) 99325-6260</a></div>
+      <div class="manual-block"><p class="manual-muted">Canal de suporte</p><a class="manual-link" href="<?= Security::e(Brand::support()['whatsapp_url']) ?>" target="_blank" rel="noopener noreferrer">WhatsApp: <?= Security::e(Brand::support()['whatsapp_label']) ?></a></div>
       <div class="manual-block"><p class="manual-muted">Notas da atualização atual</p><ul class="manual-list"><li>Navegação pública/admin revisada.</li><li>Estabilidade na atualização de etapa.</li><li>Download de currículo com nome inteligente.</li><li>Inclusão do manual no painel admin.</li></ul></div>
     </div>
   </section>
@@ -98,9 +98,7 @@ $releaseDate = trim((string)($app['release_date'] ?? ''));
       <div class="manual-content">
         <p class="manual-p">
           O Portal RH da 
-          <img src="<?= $base ?>/assets/logo-escura.png"
-              alt="TRAXTER. - Recrutamento e Seleção"
-              class="h-4 inline align-middle">
+          <strong><?= Security::e(Brand::clientName()) ?></strong>
           centraliza a gestão de recrutamento...
         </p>
         <p class="manual-p" style="margin-top:6px">Ele organiza o funil de seleção em um painel único, com histórico de movimentações, download de currículos e controles de acesso por perfil.</p>
@@ -191,7 +189,7 @@ $releaseDate = trim((string)($app['release_date'] ?? ''));
         <div class="manual-block">
           <p class="manual-p"><strong>Quem pode acessar este painel?</strong><br>Usuários autenticados com perfil administrativo (Leitor, RH, Admin e Supervisor).</p>
           <p class="manual-p" style="margin-top:8px"><strong>Posso cadastrar candidatura manualmente no admin?</strong><br>No fluxo atual, candidaturas entram pelo formulário público das vagas.</p>
-          <p class="manual-p" style="margin-top:8px"><strong>Como falar com suporte rapidamente?</strong><br><a class="manual-link" href="https://wa.me/5567993256260" target="_blank" rel="noopener noreferrer">WhatsApp (67) 99325-6260</a>.</p>
+          <p class="manual-p" style="margin-top:8px"><strong>Como falar com suporte rapidamente?</strong><br><a class="manual-link" href="<?= Security::e(Brand::support()['whatsapp_url']) ?>" target="_blank" rel="noopener noreferrer">WhatsApp <?= Security::e(Brand::support()['whatsapp_label']) ?></a>.</p>
         </div>
       </div>
     </details>

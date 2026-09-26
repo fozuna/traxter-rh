@@ -43,7 +43,14 @@ $candId = Candidatura::create([
     'indicacao_colaborador_nome' => 'Colaborador Teste ' . $suffix
 ]);
 
-$updated = Candidatura::updateStage($candId, $contratadoId, 1);
+// Usa um usuário existente (o histórico exige FK válida); cria um temporário se não houver
+$actorId = (int)$pdo->query('SELECT id FROM usuarios ORDER BY id LIMIT 1')->fetchColumn();
+if ($actorId <= 0) {
+    $pdo->prepare('INSERT INTO usuarios (nome, email, senha_hash, role) VALUES (?,?,?,?)')
+        ->execute(['Ator Teste', "ator_{$suffix}@example.test", password_hash('x', PASSWORD_BCRYPT), 'rh']);
+    $actorId = (int)$pdo->lastInsertId();
+}
+$updated = Candidatura::updateStage($candId, $contratadoId, $actorId);
 if (!$updated) {
     fwrite(STDERR, "Falha: não conseguiu mover para Contratado.\n");
     exit(1);
@@ -102,7 +109,7 @@ if (trim((string)($candPago['indicacao_metodo_pagamento'] ?? '')) !== 'PIX') {
 }
 
 Candidatura::updateIndicacaoColaborador($candId, true, 'Colaborador Edit');
-$editRes = Candidatura::updateIndicacaoPaymentDate($candId, date('d/m/Y', strtotime('-1 day')), 'Ajuste financeiro', 1);
+$editRes = Candidatura::updateIndicacaoPaymentDate($candId, date('d/m/Y', strtotime('-1 day')), 'Ajuste financeiro', $actorId);
 if (!($editRes['ok'] ?? false)) {
     fwrite(STDERR, "Falha: edição da data de pagamento não foi aceita.\n");
     exit(1);

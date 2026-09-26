@@ -2,15 +2,15 @@
 ?>
 <div class="min-h-screen flex">
   <!-- Left Container - Branding Area -->
-  <div class="hidden lg:flex lg:w-1/2 xl:w-2/3 relative" style="background-color: #1d2d44;">
+  <div class="hidden lg:flex lg:w-1/2 xl:w-2/3 relative" style="background-color: var(--ctgreen);">
     <!-- Main Logo - Centered -->
     <div class="flex items-center justify-center w-full">
-      <img src="<?= $base ?>/assets/logo.png" alt="TRAXTER. - Recrutamento e Seleção" class="w-64 h-auto">
+      <img src="<?= Security::e(Brand::logoUrl($base)) ?>" alt="<?= Security::e(Brand::logoAlt()) ?>" class="w-64 h-auto">
     </div>
     
     <!-- Isotipo - Bottom Left -->
     <div class="absolute bottom-0 left-0">
-      <img src="<?= $base ?>/assets/Isotipolinear.png" alt="TRAXTER. - Recrutamento e Seleção" class="w-60 opacity-50">
+      <img src="<?= $base ?>/assets/Isotipolinear.png" alt="" aria-hidden="true" class="w-60 opacity-50">
     </div>
   </div>
 
@@ -21,7 +21,7 @@
         <div class="text-center mb-8">
           <!-- Mobile Logo -->
           <div class="lg:hidden mb-6">
-            <img src="<?= $base ?>/assets/logo.png" alt="TRAXTER. - Recrutamento e Seleção" class="w-60 h-auto mx-auto">
+            <img src="<?= Security::e(Brand::logoUrl($base)) ?>" alt="<?= Security::e(Brand::logoAlt()) ?>" class="w-60 h-auto mx-auto rounded-lg p-3" style="background-color: var(--ctgreen);">
           </div>
           <h2 class="text-2xl font-semibold text-ctpblue">Acesso ao Painel</h2>
         </div>

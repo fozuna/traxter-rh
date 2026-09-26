@@ -23,10 +23,10 @@ module.exports = {
         xl: '1280px'
       },
       colors: {
-        ctdark: '#0d1321',
-        ctgreen: '#1d2d44',
-        ctlight: '#3e5c76',
-        ctpblue: '#0d1321',
+        ctdark: 'var(--ctdark)',
+        ctgreen: 'var(--ctgreen)',
+        ctlight: 'var(--ctlight)',
+        ctpblue: 'var(--ctpblue)',
       },
       fontFamily: {
         sans: ['Montserrat','system-ui','-apple-system','sans-serif']

@@ -13,6 +13,7 @@ if (!defined('STORAGE_PATH')) {
 }
 
 require_once __DIR__ . '/Config.php';
+require_once __DIR__ . '/Brand.php';
 require_once __DIR__ . '/Logger.php';
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/PasswordPolicy.php';

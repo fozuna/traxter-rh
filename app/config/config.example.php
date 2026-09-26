@@ -8,6 +8,23 @@ return [
         'public_jobs_url' => '',
         'env' => 'auto'
     ],
+    // Identidade da empresa cliente desta instalação
+    'cliente' => [
+        'nome' => 'Empresa Exemplo',          // aparece no portal de vagas, títulos e exportações
+        'logo' => '',                         // ex.: 'uploads/marca/logo.png' (PNG/SVG claro, para fundo escuro). Vazio = logo TRAXTER
+        'site' => '',                         // ex.: 'https://www.empresa.com.br'
+        'cores' => [                          // formato #rrggbb
+            'escuro' => '#0d1321',            // cabeçalho, menu lateral, títulos
+            'medio'  => '#1d2d44',            // botões e destaques
+            'claro'  => '#3e5c76'             // detalhes, bordas, foco
+        ]
+    ],
+    // Suporte exibido no manual do sistema
+    'suporte' => [
+        'nome' => 'TRAXTER Sistemas e Automações',
+        'site' => 'https://traxter.com.br/',
+        'whatsapp' => '5567998723814'
+    ],
     'database' => [
         'dsn' => '',
         'user' => '',

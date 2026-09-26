@@ -173,7 +173,7 @@ class AdminIndicacoesController extends Controller
             $periodo = 'Todos';
         }
         $header = [
-            'TRAXTER. - Recrutamento e Seleção RH - Programa de Indicações',
+            Brand::clientName() . ' - Programa de Indicações',
             'Período: ' . $periodo,
             'Gerado em: ' . date('d/m/Y H:i')
         ];

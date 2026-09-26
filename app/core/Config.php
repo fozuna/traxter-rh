@@ -19,6 +19,17 @@ class Config
                 'public_jobs_url' => '',
                 'env' => 'auto'
             ],
+            'cliente' => [
+                'nome' => '',
+                'logo' => '',
+                'site' => '',
+                'cores' => []
+            ],
+            'suporte' => [
+                'nome' => 'TRAXTER Sistemas e Automações',
+                'site' => 'https://traxter.com.br/',
+                'whatsapp' => '5567998723814'
+            ],
             'database' => [
                 'dsn' => '',
                 'user' => '',

@@ -41,6 +41,28 @@ Tudo fica em **`app/config/config.php`** (modelo: `app/config/config.example.php
 
 Domínios `.test`, `.local` e `localhost` são tratados como desenvolvimento (erros visíveis). Em produção, os erros vão para `storage/logs/`.
 
+## Configurar a instalação para um cliente
+
+Cada cliente tem sua instalação e seu `app/config/config.php`. A identidade visual fica na seção `cliente`:
+
+```php
+'cliente' => [
+    'nome' => 'Agro Exemplo Ltda',              // portal de vagas, títulos, exportações
+    'logo' => 'uploads/marca/logo.png',         // versão clara do logo, para fundo escuro
+    'site' => 'https://www.agroexemplo.com.br',
+    'cores' => [
+        'escuro' => '#14532d',                  // cabeçalho, menu lateral, títulos
+        'medio'  => '#15803d',                  // botões e destaques
+        'claro'  => '#4d7c0f',                  // detalhes, bordas, foco
+    ],
+],
+```
+
+- Coloque o arquivo do logo em `uploads/marca/` (PNG, SVG ou WEBP). Essa pasta não vai para o Git.
+- Sem logo configurado, o sistema usa o logo TRAXTER. Cores inválidas voltam ao padrão.
+- O contato de suporte exibido no manual fica na seção `suporte`.
+- Não é preciso recompilar o CSS: as cores são aplicadas por variáveis CSS em tempo de execução.
+
 ## Scripts úteis
 
 | Comando | Para quê |

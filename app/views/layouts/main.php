@@ -6,8 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="app-base" content="<?= Security::e($base ?? '') ?>">
   <meta name="csrf-token" content="<?= Security::e(Security::csrfToken()) ?>">
-  <title>TRAXTER RH</title>
+  <title><?= Security::e(Brand::pageTitle('Vagas')) ?></title>
   <link rel="stylesheet" href="<?= $base ?>/assets/tailwind.css?v=<?= urlencode(Config::app()['version'] ?? '') ?>">
+  <?= Brand::styleTag() ?>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Montserrat', system-ui, -apple-system, sans-serif; }
@@ -55,7 +56,7 @@
         <button type="button" class="app-nav-toggle touch-target sm:hidden" aria-controls="public-menu" aria-expanded="false" data-public-menu-toggle="1">
           <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
-        <img src="<?= $base ?>/assets/logo.png" alt="TRAXTER. - Recrutamento e Seleção" class="h-7 w-auto object-contain">
+        <img src="<?= Security::e(Brand::logoUrl($base)) ?>" alt="<?= Security::e(Brand::logoAlt()) ?>" class="h-7 w-auto object-contain">
       </div>
       <nav class="text-sm items-center gap-4 hidden sm:flex">
         <a href="<?= $base ?>/vagas" class="hover:text-ctgreen">Vagas</a>
@@ -115,7 +116,8 @@
   <?php if (!$isLoginPage): ?>
   <footer class="fixed bottom-0 left-0 right-0 border-t bg-white">
     <div class="max-w-6xl mx-auto px-4 py-6 text-gray-500 text-sm text-center">
-      © <?= date('Y') ?> <?= Config::app()['product_name'] ?? 'TRAXTER RH' ?>. Todos os direitos reservados. • v<?= Config::app()['version'] ?? '' ?>
+      © <?= date('Y') ?> <?= Security::e(Brand::clientName()) ?>. Todos os direitos reservados.
+      <span class="block sm:inline text-xs text-gray-400">Plataforma <?= Security::e(Brand::productName()) ?> v<?= Security::e(Config::app()['version'] ?? '') ?></span>
     </div>
   </footer>
   <?php endif; ?>

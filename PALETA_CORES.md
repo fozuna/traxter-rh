@@ -1,5 +1,7 @@
 # Paleta de cores (UI)
 
+> As cores agora são configuráveis por cliente em `app/config/config.php` (seção `cliente.cores`) e aplicadas via variáveis CSS (`--ctdark`, `--ctgreen`, `--ctlight`). Os valores abaixo são o padrão TRAXTER.
+
 Esta aplicação padroniza os elementos de interface usando exclusivamente os três tons abaixo como cores de marca:
 
 - Escuro: `#0d1321`

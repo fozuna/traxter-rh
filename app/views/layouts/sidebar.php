@@ -6,7 +6,7 @@ if ($publicJobsUrl === '') {
 }
 ?><div class="sidebar-inner">
   <div class="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-4">
-    <img src="<?= $base ?>/assets/logo.png" alt="TRAXTER. - Recrutamento e Seleção" class="h-8 w-auto object-contain">
+    <img src="<?= Security::e(Brand::logoUrl($base)) ?>" alt="<?= Security::e(Brand::logoAlt()) ?>" class="h-8 w-auto object-contain">
     <button type="button" class="app-nav-toggle sidebar-close touch-target text-white" aria-label="Fechar menu" data-admin-menu-close="1">
       <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 6l12 12M18 6l-12 12"/></svg>
     </button>
