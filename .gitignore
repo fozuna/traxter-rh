@@ -1,0 +1,34 @@
+node_modules/
+vendor/
+.env
+.env.*
+app/config/local.php
+/app/config/local.php
+app/config/build.php
+/app/config/build.php
+app/config/local.*.php
+storage/sessions/
+storage/ratelimit/
+storage/resumes/
+storage/audit/
+storage/logs/
+public/uploads/
+test-results/
+playwright-report/
+*.log
+*.tmp
+*.cache
+Thumbs.db
+.DS_Store
+
+# Configuração com credenciais (gerada pelo setup/instalador) - nunca versionar
+app/config/config.php
+storage/install.done
+# Uploads de clientes
+uploads/*
+!uploads/logos/
+uploads/logos/*
+!uploads/logos/.gitkeep
+# Dumps de banco com dados reais
+database/*dump*.sql
+database/backup*.sql
