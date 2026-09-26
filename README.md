@@ -148,6 +148,17 @@ php scripts/migrate_resumes.php --apply    # move, renomeia e atualiza o banco
 - Dados de candidatos (CPF, telefone, currículos) são dados pessoais sob a LGPD.
 - Senhas iniciais são geradas aleatoriamente pelo setup; não existem senhas padrão no código.
 
+## Novo cliente em 15 minutos (Hostinger)
+
+1. **Subdomínio:** hPanel → *Domínios* → `rh.cliente.com.br` (ou `vagas.cliente.com.br` apontando para a Hostinger). Apague o arquivo padrão da pasta.
+2. **SSL:** ative o certificado gratuito do subdomínio.
+3. **Banco:** *Bancos de Dados MySQL* → crie banco e usuário (anote os nomes com o prefixo `u123456789_`).
+4. **Código:** *Avançado → Git* → `git@github.com:fozuna/traxter-rh.git`, branch `main`, pasta do subdomínio → *Deploy*. (A chave SSH do hPanel já está cadastrada como deploy key no GitHub; é a mesma para todos os sites da conta.)
+5. **Instalação:** abra `https://rh.cliente.com.br/install.php` e preencha as 5 seções: empresa (nome, CNPJ, e-mail LGPD, prazo, cores), banco, acessos (admin do cliente + supervisor TRAXTER), e-mails e pasta privada (já vem sugerida, uma por cliente).
+6. **Logo (opcional):** envie a versão clara do logo para `uploads/marca/logo.png` e preencha `cliente.logo` no `config.php`.
+7. **Cron LGPD:** *Avançado → Cron Jobs*, diário: `/usr/bin/php /home/USUARIO/domains/.../scripts/lgpd_retencao.php --apply`.
+8. **Conferência:** `/vagas` e `/login` abrem; `/app/config/config.php` e `/.git/config` dão **403**; faça uma candidatura de teste e apague depois (botão *Anonimizar*).
+
 ## Publicar em subdomínio (cPanel)
 
 Exemplo: `rh.traxter.com.br`.

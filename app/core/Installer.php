@@ -62,6 +62,13 @@ class Installer
         // Validações ANTES de gravar qualquer arquivo: se algo estiver errado,
         // nada é criado e o instalador continua disponível para nova tentativa.
         self::validateAdminInput($input);
+        if (trim((string)($input['cliente_nome'] ?? '')) === '') {
+            throw new RuntimeException('Informe o nome da empresa cliente.');
+        }
+        $storagePath = $config['storage']['path'];
+        if ($storagePath !== '') {
+            self::prepareStorage($storagePath, $log);
+        }
         $pdo = self::connect($config['database'], $log);
 
         $configMode = strtolower(trim((string)($input['config_mode'] ?? 'config')));
@@ -128,6 +135,9 @@ class Installer
         $logLevel = trim((string)($input['log_level'] ?? ($logCurrent['level'] ?? 'INFO')));
         $alertEmail = trim((string)($input['log_alert_email'] ?? ($logCurrent['alert_email'] ?? '')));
         $viewerKey = trim((string)($input['log_viewer_key'] ?? ($logCurrent['viewer_key'] ?? '')));
+        if ($viewerKey === '') {
+            $viewerKey = bin2hex(random_bytes(16)); // acesso ao logs.php: gerado automaticamente
+        }
         if ($dsn === '' || $user === '' || $mailFrom === '' || $mailTo === '' || $supervisorEmail === '' || $supervisorPassword === '') {
             throw new RuntimeException('Preencha todos os campos obrigatórios do instalador.');
         }
@@ -141,17 +151,17 @@ class Installer
             ],
             // Identidade do cliente (ajuste após instalar)
             'cliente' => [
-                'nome' => '',
-                'cnpj' => '',
-                'email_privacidade' => '',
-                'retencao_meses' => 12,
-                'logo' => '',
-                'site' => '',
-                'cores' => [],
+                'nome' => trim((string)($input['cliente_nome'] ?? '')),
+                'cnpj' => trim((string)($input['cliente_cnpj'] ?? '')),
+                'email_privacidade' => trim((string)($input['cliente_email_privacidade'] ?? '')),
+                'retencao_meses' => max(1, min(60, (int)($input['cliente_retencao_meses'] ?? 12) ?: 12)),
+                'logo' => '',                 // ex.: 'uploads/marca/logo.png'
+                'site' => trim((string)($input['cliente_site'] ?? '')),
+                'cores' => self::colorsFromInput($input),
             ],
-            // Em produção, aponte para uma pasta FORA da pasta pública do site
+            // Arquivos privados (currículos, logs, sessões): fora da pasta pública do site
             'storage' => [
-                'path' => '',
+                'path' => self::normalizeStoragePath((string)($input['storage_path'] ?? '')),
             ],
             'security' => [
                 'supervisor_email' => $supervisorEmail,
@@ -245,6 +255,57 @@ class Installer
     {
         $log('Executando migrações incrementais.');
         SchemaManager::ensure();
+    }
+
+    /** Sugestão de pasta privada: fora do site, uma por instalação (ex.: /home/u123/traxter-rh-storage/rh-cliente-com-br). */
+    public static function suggestStoragePath(): string
+    {
+        $base = str_replace('\\', '/', self::basePath());
+        $home = preg_match('#^(/home/[^/]+)#', $base, $m) ? $m[1] : dirname($base, 2);
+        $host = strtolower((string)($_SERVER['HTTP_HOST'] ?? basename($base)));
+        $slug = trim((string)preg_replace('/[^a-z0-9]+/', '-', preg_replace('/:\d+$/', '', $host)), '-');
+        return rtrim($home, '/') . '/traxter-rh-storage/' . ($slug !== '' ? $slug : 'instalacao');
+    }
+
+    private static function normalizeStoragePath(string $path): string
+    {
+        $path = trim(str_replace('\\', '/', $path));
+        return $path === '' ? '' : rtrim($path, '/');
+    }
+
+    /** Cria e valida a pasta privada ANTES de gravar qualquer configuração. */
+    private static function prepareStorage(string $path, callable $log): void
+    {
+        $isAbsolute = str_starts_with($path, '/') || (bool)preg_match('#^[A-Za-z]:/#', $path);
+        if (!$isAbsolute || str_contains($path, '..')) {
+            throw new RuntimeException('Pasta privada: informe um caminho absoluto, sem "..".');
+        }
+        $base = rtrim(str_replace('\\', '/', (string)realpath(self::basePath())), '/');
+        if (str_starts_with($path . '/', $base . '/')) {
+            throw new RuntimeException('Pasta privada não pode ficar dentro da pasta do site (' . $base . '). Use um caminho fora dela.');
+        }
+        foreach (['', '/resumes', '/logs', '/sessions', '/ratelimit', '/audit'] as $sub) {
+            self::ensureDir($path . $sub);
+        }
+        $probe = $path . '/.write-test-' . bin2hex(random_bytes(4));
+        if (@file_put_contents($probe, 'ok') === false) {
+            throw new RuntimeException('Pasta privada sem permissão de escrita: ' . $path);
+        }
+        @unlink($probe);
+        @file_put_contents($path . '/.htaccess', "Require all denied\n");
+        $log('Pasta privada pronta: ' . $path);
+    }
+
+    private static function colorsFromInput(array $input): array
+    {
+        $out = [];
+        foreach (['escuro' => 'cor_escuro', 'medio' => 'cor_medio', 'claro' => 'cor_claro'] as $key => $field) {
+            $value = strtolower(trim((string)($input[$field] ?? '')));
+            if (preg_match('/^#[0-9a-f]{6}$/', $value)) {
+                $out[$key] = $value;
+            }
+        }
+        return $out;
     }
 
     private static function createSupervisorIfNeeded(array $input, callable $log): void

@@ -83,6 +83,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !Installer::isInstalled()) {
                 'log_level' => (string)($_POST['log_level'] ?? 'INFO'),
                 'log_alert_email' => (string)($_POST['log_alert_email'] ?? ''),
                 'log_viewer_key' => (string)($_POST['log_viewer_key'] ?? ''),
+                'cliente_nome' => (string)($_POST['cliente_nome'] ?? ''),
+                'cliente_cnpj' => (string)($_POST['cliente_cnpj'] ?? ''),
+                'cliente_site' => (string)($_POST['cliente_site'] ?? ''),
+                'cliente_email_privacidade' => (string)($_POST['cliente_email_privacidade'] ?? ''),
+                'cliente_retencao_meses' => (string)($_POST['cliente_retencao_meses'] ?? '12'),
+                'cor_escuro' => (string)($_POST['cor_escuro'] ?? ''),
+                'cor_medio' => (string)($_POST['cor_medio'] ?? ''),
+                'cor_claro' => (string)($_POST['cor_claro'] ?? ''),
+                'storage_path' => (string)($_POST['storage_path'] ?? ''),
             ], function (string $line) use (&$messages): void {
                 $messages[] = $line;
             });
@@ -119,6 +128,9 @@ $isLocked = Installer::isInstalled();
     .bad{color:#991b1b}
     .log{background:#0b1220;color:#dbeafe;padding:12px;border-radius:10px;white-space:pre-wrap;font-size:12px;max-height:260px;overflow:auto}
     .note{font-size:13px;color:#475569}
+    h3{grid-column:1/-1;font-size:15px;margin:14px 0 0;color:#0f172a;border-top:1px solid #e2e8f0;padding-top:12px}
+    .full{grid-column:1/-1}
+    .colors{display:flex;gap:8px}.colors input{width:56px;height:40px;padding:2px}
     @media(max-width:760px){.grid{grid-template-columns:1fr}}
   </style>
 </head>
@@ -140,56 +152,64 @@ $isLocked = Installer::isInstalled();
       <?php if ($isLocked): ?>
         <p class="bad"><strong>Instalador bloqueado:</strong> instalação já concluída.</p>
       <?php else: ?>
+      <?php
+        // Reaproveita o que foi digitado quando a instalação falha (exceto senhas)
+        $v = static function (string $k, string $default = '') use ($defaults): string {
+            $val = $_POST[$k] ?? ($defaults[$k] ?? $default);
+            return htmlspecialchars((string)$val, ENT_QUOTES, 'UTF-8');
+        };
+        $storageSugestao = Installer::suggestStoragePath();
+      ?>
       <form method="post" class="grid">
         <input type="hidden" name="csrf" value="<?= htmlspecialchars($token) ?>">
-        <div class="field">
-          <label>Ambiente</label>
-          <select name="app_env">
-            <option value="prod" <?= $defaults['app_env'] === 'prod' ? 'selected' : '' ?>>prod</option>
-            <option value="dev" <?= $defaults['app_env'] === 'dev' ? 'selected' : '' ?>>dev</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Modo de configuração</label>
-          <select name="config_mode">
-            <option value="config">app/config/config.php (recomendado)</option>
-            <option value="local">app/config/local.php</option>
-          </select>
-        </div>
+        <input type="hidden" name="app_env" value="prod">
+        <input type="hidden" name="config_mode" value="config">
         <?php if (is_string(getenv('INSTALLER_KEY')) && trim((string)getenv('INSTALLER_KEY')) !== ''): ?>
-        <div class="field">
-          <label>Chave do instalador</label>
-          <input name="installer_key" type="password" required>
-        </div>
+        <div class="field full"><label>Chave do instalador</label><input name="installer_key" type="password" required></div>
         <?php endif; ?>
 
-        <div class="field"><label>DB DSN</label><input name="db_dsn" required placeholder="mysql:host=localhost;dbname=...;charset=utf8mb4" value="<?= htmlspecialchars($defaults['db_dsn']) ?>"></div>
-        <div class="field"><label>DB Usuário</label><input name="db_user" required value="<?= htmlspecialchars($defaults['db_user']) ?>"></div>
-        <div class="field"><label>DB Senha</label><input name="db_pass" type="password"></div>
-        <div class="field"><label>E-mail RH</label><input name="mail_to_hr" required placeholder="rh@dominio.com" value="<?= htmlspecialchars($defaults['mail_to_hr']) ?>"></div>
-        <div class="field"><label>E-mail remetente</label><input name="mail_from" required placeholder="no-reply@dominio.com" value="<?= htmlspecialchars($defaults['mail_from']) ?>"></div>
-        <div class="field"><label>E-mail supervisor</label><input name="supervisor_email" required value="<?= htmlspecialchars($defaults['supervisor_email']) ?>"></div>
-        <div class="field"><label>Senha supervisor</label><input name="supervisor_password" type="password" required></div>
-        <div class="field"><label>E-mail admin inicial</label><input name="admin_email" placeholder="admin@dominio.com" value="<?= htmlspecialchars($defaults['admin_email']) ?>"></div>
-        <div class="field"><label>Senha admin inicial</label><input name="admin_password" type="password"></div>
-        <div class="field">
-          <label>Nível de log</label>
-          <select name="log_level">
-            <option value="DEBUG" <?= $defaults['log_level'] === 'DEBUG' ? 'selected' : '' ?>>DEBUG</option>
-            <option value="INFO" <?= $defaults['log_level'] === 'INFO' ? 'selected' : '' ?>>INFO</option>
-            <option value="WARNING" <?= $defaults['log_level'] === 'WARNING' ? 'selected' : '' ?>>WARNING</option>
-            <option value="ERROR" <?= $defaults['log_level'] === 'ERROR' ? 'selected' : '' ?>>ERROR</option>
-            <option value="CRITICAL" <?= $defaults['log_level'] === 'CRITICAL' ? 'selected' : '' ?>>CRITICAL</option>
-          </select>
+        <h3>1. Empresa cliente</h3>
+        <div class="field"><label>Nome da empresa *</label><input name="cliente_nome" required value="<?= $v('cliente_nome') ?>" placeholder="Ex.: Agro Exemplo Ltda"></div>
+        <div class="field"><label>CNPJ</label><input name="cliente_cnpj" value="<?= $v('cliente_cnpj') ?>" placeholder="00.000.000/0001-00"></div>
+        <div class="field"><label>Site da empresa</label><input name="cliente_site" value="<?= $v('cliente_site') ?>" placeholder="https://www.empresa.com.br"></div>
+        <div class="field"><label>E-mail para pedidos LGPD</label><input name="cliente_email_privacidade" type="email" value="<?= $v('cliente_email_privacidade') ?>" placeholder="privacidade@empresa.com.br"></div>
+        <div class="field"><label>Guardar dados de candidatos por (meses)</label><input name="cliente_retencao_meses" type="number" min="1" max="60" value="<?= $v('cliente_retencao_meses', '12') ?>"></div>
+        <div class="field"><label>Cores da marca (escura · média · clara)</label>
+          <div class="colors">
+            <input type="color" name="cor_escuro" value="<?= $v('cor_escuro', '#0d1321') ?>" title="Escura: cabeçalho e menu">
+            <input type="color" name="cor_medio" value="<?= $v('cor_medio', '#1d2d44') ?>" title="Média: botões">
+            <input type="color" name="cor_claro" value="<?= $v('cor_claro', '#3e5c76') ?>" title="Clara: detalhes">
+          </div>
         </div>
-        <div class="field"><label>E-mail de alerta de log</label><input name="log_alert_email" placeholder="devops@dominio.com" value="<?= htmlspecialchars($defaults['log_alert_email']) ?>"></div>
-        <div class="field"><label>Chave do visualizador de logs</label><input name="log_viewer_key" placeholder="chave-forte" value="<?= htmlspecialchars($defaults['log_viewer_key']) ?>"></div>
-        <div class="field" style="justify-content:flex-end">
-          <label><input type="checkbox" name="allow_overwrite_config" value="1"> Permitir sobrescrever config existente</label>
+
+        <h3>2. Banco de dados</h3>
+        <div class="field full"><label>DSN *</label><input name="db_dsn" required placeholder="mysql:host=localhost;dbname=NOME_DO_BANCO;charset=utf8mb4" value="<?= $v('db_dsn') ?>"></div>
+        <div class="field"><label>Usuário *</label><input name="db_user" required value="<?= $v('db_user') ?>"></div>
+        <div class="field"><label>Senha</label><input name="db_pass" type="password"></div>
+
+        <h3>3. Acessos</h3>
+        <p class="note full">Senhas: 12+ caracteres, com maiúscula, minúscula, número e símbolo. Use e-mails reais e diferentes.</p>
+        <div class="field"><label>E-mail do administrador (cliente) *</label><input name="admin_email" type="email" required placeholder="rh@empresa.com.br" value="<?= $v('admin_email') ?>"></div>
+        <div class="field"><label>Senha do administrador *</label><input name="admin_password" type="password" required></div>
+        <div class="field"><label>E-mail do supervisor (TRAXTER) *</label><input name="supervisor_email" type="email" required value="<?= $v('supervisor_email') ?>"></div>
+        <div class="field"><label>Senha do supervisor *</label><input name="supervisor_password" type="password" required></div>
+
+        <h3>4. E-mails do sistema</h3>
+        <div class="field"><label>Recebe avisos de candidatura *</label><input name="mail_to_hr" type="email" required placeholder="rh@empresa.com.br" value="<?= $v('mail_to_hr') ?>"></div>
+        <div class="field"><label>Remetente (do seu domínio) *</label><input name="mail_from" type="email" required placeholder="no-reply@traxter.com.br" value="<?= $v('mail_from') ?>"></div>
+        <div class="field"><label>Alertas de erro</label><input name="log_alert_email" type="email" placeholder="dev@traxter.com.br" value="<?= $v('log_alert_email') ?>"></div>
+        <input type="hidden" name="log_level" value="INFO">
+
+        <h3>5. Arquivos privados</h3>
+        <div class="field full"><label>Pasta para currículos, logs e sessões (fora do site)</label>
+          <input name="storage_path" value="<?= $v('storage_path', $storageSugestao) ?>">
+          <span class="note">Sugestão calculada para este servidor, uma pasta por cliente. A pasta é criada automaticamente. Deixe vazio só em ambiente local.</span>
         </div>
-        <div style="grid-column:1/-1;display:flex;gap:12px;align-items:center">
+        <input type="hidden" name="log_viewer_key" value="">
+
+        <div class="full" style="display:flex;gap:12px;align-items:center;margin-top:8px">
           <button type="submit" <?= $allOk ? '' : 'disabled' ?>>Instalar agora</button>
-          <span class="note">Após sucesso, o instalador é desativado automaticamente.</span>
+          <span class="note">Nada é gravado se algum dado estiver errado. Após o sucesso, o instalador é bloqueado.</span>
         </div>
       </form>
       <?php endif; ?>
