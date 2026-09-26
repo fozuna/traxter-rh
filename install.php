@@ -200,7 +200,7 @@ $isLocked = Installer::isInstalled();
       <?php endif; ?>
 
       <?php if ($success): ?>
-        <p class="ok"><strong>Instalação concluída.</strong> <?= $selfDeleted ? 'O instalador foi removido automaticamente.' : 'Remova manualmente o arquivo public/install.php.' ?></p>
+        <p class="ok"><strong>Instalação concluída.</strong> <?= $selfDeleted ? 'O instalador foi removido automaticamente.' : 'O instalador já está bloqueado; se desejar, remova install.php do servidor.' ?></p>
       <?php endif; ?>
     </div>
   </div>

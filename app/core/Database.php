@@ -3,6 +3,12 @@ class Database
 {
     private static ?PDO $pdo = null;
 
+    /** Fecha a conexão atual (a próxima chamada a conn() reconecta com a config vigente). */
+    public static function reset(): void
+    {
+        self::$pdo = null;
+    }
+
     public static function conn(): \PDO
     {
         if (self::$pdo === null) {

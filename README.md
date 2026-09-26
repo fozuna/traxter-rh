@@ -118,6 +118,20 @@ php scripts/migrate_resumes.php --apply    # move, renomeia e atualiza o banco
 - Dados de candidatos (CPF, telefone, currículos) são dados pessoais sob a LGPD.
 - Senhas iniciais são geradas aleatoriamente pelo setup; não existem senhas padrão no código.
 
-## Deploy (cPanel)
+## Publicar em subdomínio (cPanel)
 
-Use `.cpanel.yml.example` como base: copie para `.cpanel.yml`, ajuste `DEPLOYPATH` para a conta do cliente e crie o `app/config/config.php` diretamente no servidor. Guia complementar em `DEPLOY_RAPIDO.md` e `INSTALACAO_WEB.md`.
+Exemplo: `rh.traxter.com.br`.
+
+1. **Subdomínio:** cPanel → *Domínios* → criar `rh.traxter.com.br` com raiz `public_html/rh` (ou `/home/USUARIO/rh.traxter.com.br`).
+2. **SSL:** cPanel → *SSL/TLS Status* → *Run AutoSSL* para o subdomínio.
+3. **PHP:** *MultiPHP Manager* → PHP 8.1 ou superior, com `pdo_mysql`, `mbstring` e `fileinfo`.
+4. **Banco:** *MySQL Databases* → criar banco e usuário, e dar **todas as permissões** ao usuário no banco.
+5. **Arquivos:** no GitHub, *Code → Download ZIP*; no *Gerenciador de Arquivos*, envie e extraia o ZIP **dentro** da raiz do subdomínio (os arquivos `index.php` e `.htaccess` devem ficar direto na raiz).
+6. **Pasta privada:** crie `/home/USUARIO/traxter-rh-storage` (fora de `public_html`).
+7. **Instalação:** acesse `https://rh.traxter.com.br/install.php`, informe o DSN `mysql:host=localhost;dbname=BANCO;charset=utf8mb4`, usuário e senha do banco, e-mails e o administrador (senha com 12+ caracteres, maiúscula, minúscula, número e símbolo). Ao concluir, o instalador se bloqueia e se remove.
+8. **Ajustes finais** em `app/config/config.php` (pelo Gerenciador de Arquivos): seção `cliente` (nome, logo, cores) e `'storage' => ['path' => '/home/USUARIO/traxter-rh-storage']`.
+9. **Conferência:** `https://rh.traxter.com.br/login` e `https://rh.traxter.com.br/vagas`. Teste que `https://rh.traxter.com.br/app/config/config.php` e `https://rh.traxter.com.br/database/schema.sql` retornam **403**.
+
+Se o cPanel tiver *Terminal*, `php scripts/preflight.php` confere tudo de uma vez.
+
+Deploy automatizado: `.cpanel.yml.example` (copie para `.cpanel.yml` e ajuste `DEPLOYPATH`).

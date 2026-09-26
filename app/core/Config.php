@@ -88,6 +88,12 @@ class Config
         return self::$cache;
     }
 
+    /** Descarta o cache (usado pelo instalador logo após gravar o config.php). */
+    public static function reload(): void
+    {
+        self::$cache = null;
+    }
+
     public static function app(): array
     {
         $cfg = self::get();

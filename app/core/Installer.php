@@ -28,7 +28,7 @@ class Installer
         $checks[] = self::check('Extensão PDO', extension_loaded('pdo'));
         $checks[] = self::check('Extensão pdo_mysql', extension_loaded('pdo_mysql'));
         $checks[] = self::check('Diretório storage gravável', self::isWritableDir(self::storagePath()));
-        $checks[] = self::check('Diretório public/uploads gravável', self::isWritableDir(self::basePath() . '/public/uploads'));
+        $checks[] = self::check('Diretório uploads gravável', self::isWritableDir(self::basePath() . '/uploads'));
         $checks[] = self::check('Arquivo schema.sql disponível', is_file(self::basePath() . '/database/schema.sql'));
         return $checks;
     }
@@ -72,6 +72,9 @@ class Installer
             $log('Arquivo de configuração existente preservado: ' . str_replace(self::basePath() . '/', '', $targetConfigPath));
         }
 
+        // Recarrega a configuração recém-gravada para que Database/SchemaManager usem o banco informado
+        Config::reload();
+        Database::reset();
         $pdo = self::connect($config['database'], $log);
         self::importSchema($pdo, $log);
         self::runSchemaEnsure($log);
@@ -221,8 +224,13 @@ class Installer
             $log('Usuário admin já existe: ' . $email);
             return;
         }
+        $policy = PasswordPolicy::validate($password);
+        if (!$policy['valid']) {
+            throw new RuntimeException('Senha do admin fraca: ' . implode(' ', $policy['errors'] ?? []));
+        }
         $hash = password_hash($password, PASSWORD_BCRYPT);
-        User::create('Administrador', $email, $hash, 'admin');
+        $id = User::create('Administrador', $email, $hash, 'admin');
+        User::setActiveStatus($id, true); // conta já nasce ativa (senão o login retorna "conta inativa")
         $log('Usuário admin criado: ' . $email);
     }
 
@@ -234,7 +242,7 @@ class Installer
             self::storagePath() . '/ratelimit',
             self::storagePath() . '/audit',
             self::storagePath() . '/logs',
-            self::basePath() . '/public/uploads/logos',
+            self::basePath() . '/uploads/logos',
         ];
         foreach ($dirs as $dir) {
             self::ensureDir($dir);
@@ -254,17 +262,19 @@ class Installer
 
     private static function trySelfDelete(callable $log): bool
     {
-        $self = self::basePath() . '/public/install.php';
-        if (!is_file($self)) {
-            return false;
+        $deletedAny = false;
+        foreach ([self::basePath() . '/install.php', self::basePath() . '/public/install.php'] as $file) {
+            if (!is_file($file)) {
+                continue;
+            }
+            if (@unlink($file)) {
+                $deletedAny = true;
+                $log('Instalador removido: ' . basename(dirname($file)) . '/' . basename($file));
+            } else {
+                $log('Não foi possível remover ' . $file . '. Remova manualmente (o instalador já está bloqueado).');
+            }
         }
-        $deleted = @unlink($self);
-        if ($deleted) {
-            $log('Instalador web removido automaticamente.');
-        } else {
-            $log('Falha ao remover instalador automaticamente. Remova public/install.php manualmente.');
-        }
-        return $deleted;
+        return $deletedAny;
     }
 
     private static function check(string $label, bool $ok): array
